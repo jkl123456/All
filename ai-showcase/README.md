@@ -24,10 +24,11 @@ npm run seed              # 初始化 6 件预置作品 + 管理员
 npm start                 # http://127.0.0.1:3000
 ```
 
-`npm run seed` 默认创建：
+`npm run seed` 会读取 `.env` 里的 `ADMIN_EMAIL` / `ADMIN_PASSWORD`：
 
-- 管理员 `admin@zhijiyuan.local / admin123456`
-- 系统作者 `showcase@zhijiyuan.local`（6 件预置作品的作者）
+- 邮箱对应的账号不存在时创建管理员；
+- 已存在时更新昵称、角色，并把密码同步为 `ADMIN_PASSWORD`（忘记密码时重跑一次即可重置）；
+- 同时创建系统作者 `showcase@zhijiyuan.local`，6 件预置作品都挂在它名下。
 
 正式使用前请修改 `.env` 里的 `ADMIN_EMAIL` 与 `ADMIN_PASSWORD`，并重新运行 `npm run seed`。
 

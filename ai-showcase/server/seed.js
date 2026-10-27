@@ -21,11 +21,12 @@ const adminPassword = process.env.ADMIN_PASSWORD || 'admin123456';
 
 function ensureUser(email, name, role, password) {
   const existing = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  const hash = bcrypt.hashSync(password, 10);
   if (existing) {
-    db.prepare('UPDATE users SET name = ?, role = ? WHERE id = ?').run(name, role, existing.id);
+    db.prepare('UPDATE users SET name = ?, role = ?, password_hash = ? WHERE id = ?').run(name, role, hash, existing.id);
+    console.log(`更新用户 ${email}（密码已同步为 ADMIN_PASSWORD）`);
     return existing.id;
   }
-  const hash = bcrypt.hashSync(password, 10);
   const id = db
     .prepare('INSERT INTO users (email, password_hash, name, role, created_at) VALUES (?, ?, ?, ?, ?)')
     .run(email, hash, name, role, Date.now()).lastInsertRowid;
