@@ -279,6 +279,27 @@ body.detail-body { padding-bottom: 96px; }
 
 .head-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 20px; }
 
+.repo-inline {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #c7cbf5;
+  word-break: break-all;
+}
+.repo-inline:hover { text-decoration-color: var(--accent); }
+.repo-inline::after {
+  content: "↗";
+  margin-left: 5px;
+  font-size: 11px;
+  text-decoration: none;
+  color: var(--soft);
+}
+
 /* ---------------- 截图区 ---------------- */
 .shots-block { margin-top: 30px; }
 .shot-section + .shot-section { margin-top: 34px; }

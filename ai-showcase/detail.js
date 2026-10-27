@@ -204,7 +204,9 @@
 
     const actions = [];
     if (project.repo) {
-      actions.push(`<a class="btn primary" href="${escapeHtml(project.repo)}" target="_blank" rel="noopener">打开开源地址 ↗</a>`);
+      actions.push(
+        `<a class="repo-inline" href="${escapeHtml(project.repo)}" target="_blank" rel="noopener">${escapeHtml(project.repo)}</a>`
+      );
     }
     actions.push('<a class="btn ghost" href="index.html">返回作品墙</a>');
     $('#dActions').innerHTML = actions.join('');
