@@ -1,17 +1,18 @@
 # AI 造物馆 · AI Maker Gallery
 
-一个只放作品的展示站：收集用 AI 开发的小软件、游戏与工具。不上传源码、不跑在线 Demo，只保留几张 PC / 手机截图、一段介绍、玩法、技术栈，以及作者留下的开源地址和联系方式。
+一个只放作品的展示站：收集用 AI 开发的小软件、游戏与工具。不上传源码、不跑在线 Demo，只保留 4 张 PC 截图、2 张手机截图、一段介绍、玩法、技术栈，以及作者留下的开源地址和联系方式。
 
 ![首页](assets/projects/universe/pc-2.jpg)
 
 ## 功能
 
-- **作品墙**：卡片网格展示，支持分类、平台筛选与全文搜索（名称、简介、技术栈、玩法）。
-- **作品详情**：PC / 手机截图画廊，缩略图切换、键盘左右翻页，介绍、玩法、技术栈、联系方式与开源地址。
-- **提交作品**：表单最多上传 8 张截图，拖拽或点选，自动压缩到 1600px；每张图可一键切换「PC 端 / 手机端」标注。
+- **作品墙**：PC 一排 4 个、手机一排 2 个；14 个细分分类（3D 游戏、知识教育、图形渲染、Web 应用、数据可视化、开发工具、桌面应用、自动化、AI 应用、效率工具、内容创作、音视频、实验项目、本地工具），支持分类筛选与全文搜索。
+- **独立详情页**：`detail.html?id=xxx`，图片全部平铺展示——4 张 PC 大图两列排布，2 张手机图并排，点击任意图片全屏放大。
+- **长介绍**：每件作品 600–800 字，分段落展示；玩法清单、技术栈、平台、联系人与 QQ 都在详情页。
+- **提交作品**：最多 8 张截图，拖拽或点选，自动压缩到 1600px；每张图可一键切换「PC 端 / 手机端」标注；分类最多选 3 个。
 - **本地持久化**：提交的作品存在浏览器 IndexedDB 里，刷新不丢；预置作品来自 `data/projects.js`。
-- **导入 / 导出**：把自己的提交导出成 JSON，交给站长收录；也可以导入别人分享的作品包。
-- **响应式**：桌面三列、平板两列、手机单列；详情与表单在手机上全屏显示。
+- **导入 / 导出**：把自己的提交导出成 JSON，交给站长收录（QQ 993739647）；也可以导入别人分享的作品包。
+- **响应式**：桌面四列、平板三列、手机两列；详情页与表单在手机上单列全屏。
 
 ## 运行
 
@@ -29,7 +30,7 @@ python -m http.server 8899
 1. 打开仓库 **Settings → Pages**，把 Source 切到 **GitHub Actions**；
 2. 推送到 `main`（或手动运行 workflow），站点会发布在 `https://<用户名>.github.io/All/`。
 
-也可以把 `ai-showcase/` 单独建一个仓库，根目录直接发布，不需要构建，也不需要 workflow。
+也可以把 `ai-showcase/` 单独建一个仓库，根目录直接发布，不需要构建。
 
 ## 收录作品
 
@@ -46,18 +47,23 @@ python -m http.server 8899
   id: 'zhiyu',
   name: '知屿 · 知识群岛',
   tagline: '一句话简介',
-  category: '游戏',                 // 游戏 / 知识教育 / 开发工具 / 自动化 / 其他
+  categories: ['3D 游戏', '知识教育', '图形渲染', 'Web 应用'], // 可多选，最多 3 个
   platforms: ['Web', '移动端'],
-  description: '介绍……',
+  description: '600–800 字介绍，用 \\n\\n 分段……',
   gameplay: ['玩法一', '玩法二'],
   stack: ['three.js', 'Vite'],
   repo: 'https://github.com/...',   // 选填
   contactName: '昵称',              // 选填
   contact: '邮箱 / 主页 / 微信',     // 选填
-  cover: 'assets/projects/zhiyu/pc-1.jpg',
+  qq: '993739647',
+  cover: 'assets/projects/zhiyu/pc-2.jpg',
   images: [
     { src: 'assets/projects/zhiyu/pc-1.jpg', label: 'pc' },
-    { src: 'assets/projects/zhiyu/mobile-1.jpg', label: 'mobile' }
+    { src: 'assets/projects/zhiyu/pc-2.jpg', label: 'pc' },
+    { src: 'assets/projects/zhiyu/pc-3.jpg', label: 'pc' },
+    { src: 'assets/projects/zhiyu/pc-4.jpg', label: 'pc' },
+    { src: 'assets/projects/zhiyu/mobile-1.jpg', label: 'mobile' },
+    { src: 'assets/projects/zhiyu/mobile-2.jpg', label: 'mobile' }
   ]
 }
 ```
@@ -65,11 +71,14 @@ python -m http.server 8899
 ## 目录
 
 ```
-index.html          页面结构
-styles.css          设计系统与响应式
-app.js              筛选、详情、提交、IndexedDB、导入导出
-data/projects.js    预置作品数据
-assets/projects/    各作品截图
+index.html            首页：搜索、14 个分类、四列作品墙、提交表单
+detail.html           作品详情页：4 PC + 2 手机截图平铺、长介绍、侧栏信息
+styles.css            首页与共用组件
+detail.css            详情页与图片灯箱
+app.js                首页：筛选、搜索、提交、IndexedDB、导入导出
+detail.js             详情页渲染与灯箱
+data/projects.js      分类、站点信息与 6 件预置作品
+assets/projects/      各作品截图（每件 4 PC + 2 手机）
 ```
 
 ## 说明

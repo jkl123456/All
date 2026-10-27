@@ -10,6 +10,10 @@
     <td width="50%"><img src="screenshots/pc-2.jpg" alt="批量导入文案"></td>
   </tr>
   <tr>
+    <td><img src="screenshots/pc-3.jpg" alt="PC 端截图 3"></td>
+    <td><img src="screenshots/pc-4.jpg" alt="PC 端截图 4"></td>
+  </tr>
+  <tr>
     <td><img src="screenshots/mobile-1.jpg" alt="手机端首屏"></td>
     <td><img src="screenshots/mobile-2.jpg" alt="手机端导入面板"></td>
   </tr>

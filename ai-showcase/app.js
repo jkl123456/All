@@ -1,23 +1,20 @@
-/* AI 造物馆 —— 纯静态作品展示站
- * 预置作品来自 data/projects.js；用户提交存 IndexedDB。
- */
+/* AI 造物馆 —— 首页：筛选、搜索、提交（预置数据来自 data/projects.js，提交存 IndexedDB） */
 (() => {
   'use strict';
 
   const SEED = Array.isArray(window.SEED_PROJECTS) ? window.SEED_PROJECTS : [];
-  const CATEGORIES = ['游戏', '知识教育', '开发工具', '自动化', '其他'];
+  const CATEGORIES = Array.isArray(window.CATEGORIES) ? window.CATEGORIES : [];
+  const SITE = window.SITE || { qq: '993739647' };
   const PLATFORMS = ['Web', '移动端', 'Windows', 'macOS', 'Linux'];
   const MAX_SHOTS = 8;
+  const MAX_CATS = 3;
   const DB_NAME = 'ai-maker-gallery';
   const STORE = 'projects';
 
   const state = {
     custom: [],
     category: '全部',
-    platform: '全部',
     query: '',
-    detail: null,
-    shotIndex: 0,
     draftShots: []
   };
 
@@ -91,31 +88,29 @@
     });
   }
 
-  /* ---------------- 数据合并 ---------------- */
+  /* ---------------- 数据 ---------------- */
   function allProjects() {
-    const custom = state.custom.map((item) => ({ ...item, custom: true }));
-    return [...custom, ...SEED];
+    return [...state.custom.map((item) => ({ ...item, custom: true })), ...SEED];
   }
 
-  function categories() {
-    const set = new Set(['全部']);
-    allProjects().forEach((p) => p.category && set.add(p.category));
-    return Array.from(set);
-  }
-
-  function platformList() {
-    const set = new Set(['全部']);
-    allProjects().forEach((p) => (p.platforms || []).forEach((x) => set.add(x)));
-    return Array.from(set);
+  function categoriesWithItems() {
+    return CATEGORIES.filter((cat) => allProjects().some((p) => (p.categories || []).includes(cat)));
   }
 
   function filtered() {
     const q = state.query.trim().toLowerCase();
     return allProjects().filter((p) => {
-      if (state.category !== '全部' && p.category !== state.category) return false;
-      if (state.platform !== '全部' && !(p.platforms || []).includes(state.platform)) return false;
+      if (state.category !== '全部' && !(p.categories || []).includes(state.category)) return false;
       if (!q) return true;
-      const haystack = [p.name, p.tagline, p.description, p.category, p.contactName, ...(p.stack || []), ...(p.gameplay || [])]
+      const haystack = [
+        p.name,
+        p.tagline,
+        p.description,
+        p.contactName,
+        ...(p.categories || []),
+        ...(p.stack || []),
+        ...(p.gameplay || [])
+      ]
         .join(' ')
         .toLowerCase();
       return haystack.includes(q);
@@ -128,24 +123,16 @@
     const shots = projects.reduce((sum, p) => sum + (p.images || []).length, 0);
     $('#statProjects').textContent = projects.length;
     $('#statShots').textContent = shots;
-    $('#statCats').textContent = new Set(projects.map((p) => p.category).filter(Boolean)).size;
+    $('#statCats').textContent = categoriesWithItems().length;
     $('#footerCount').textContent = projects.length + ' 件作品 · ' + shots + ' 张截图';
   }
 
   function renderFilters() {
-    const catWrap = $('#categoryFilters');
-    catWrap.innerHTML = categories()
+    const cats = ['全部', ...categoriesWithItems()];
+    $('#categoryFilters').innerHTML = cats
       .map(
         (cat) =>
-          `<button class="chip ${state.category === cat ? 'active' : ''}" type="button" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
-      )
-      .join('');
-
-    const platWrap = $('#platformFilters');
-    platWrap.innerHTML = platformList()
-      .map(
-        (plat) =>
-          `<button class="chip ${state.platform === plat ? 'active' : ''}" type="button" data-platform="${escapeHtml(plat)}">${plat === '全部' ? '全部平台' : escapeHtml(plat)}</button>`
+          `<button class="chip ${state.category === cat ? 'active' : ''}" type="button" role="tab" aria-selected="${state.category === cat}" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
       )
       .join('');
   }
@@ -153,22 +140,22 @@
   function cardTemplate(project, index) {
     const shots = project.images || [];
     const cover = project.cover || (shots[0] && shots[0].src) || '';
-    const stack = (project.stack || []).slice(0, 4);
-    const platforms = (project.platforms || []).slice(0, 3);
+    const stack = (project.stack || []).slice(0, 3);
+    const cat = (project.categories || [])[0] || '其他';
     return `
-      <article class="card" tabindex="0" role="button" data-id="${escapeHtml(project.id)}" style="animation-delay:${Math.min(index * 40, 320)}ms" aria-label="查看 ${escapeHtml(project.name)}">
+      <article class="card" tabindex="0" role="link" data-id="${escapeHtml(project.id)}" style="animation-delay:${Math.min(index * 35, 280)}ms" aria-label="查看 ${escapeHtml(project.name)}">
         <div class="card-cover">
           ${cover ? `<img src="${cover}" alt="${escapeHtml(project.name)} 截图" loading="lazy">` : ''}
-          <span class="card-badge">${escapeHtml(project.category || '其他')}</span>
-          <span class="card-shots">${shots.length} 张</span>
+          <span class="card-badge">${escapeHtml(cat)}</span>
+          <span class="card-shots">${shots.length} 图</span>
         </div>
         <div class="card-body">
           <h3>${escapeHtml(project.name)}</h3>
           <p>${escapeHtml(project.tagline || '')}</p>
           <div class="card-stack">${stack.map((s) => `<span>${escapeHtml(s)}</span>`).join('')}</div>
           <div class="card-foot">
-            <div class="platforms">${platforms.map((p) => `<span>${escapeHtml(p)}</span>`).join('')}</div>
-            <span class="open">查看详情 →</span>
+            <span>${(project.platforms || []).slice(0, 2).map(escapeHtml).join(' · ') || 'Web'}</span>
+            <span class="open">详情 →</span>
           </div>
         </div>
       </article>`;
@@ -176,12 +163,9 @@
 
   function renderGrid() {
     const list = filtered();
-    const grid = $('#projectGrid');
-    grid.innerHTML = list.map(cardTemplate).join('');
+    $('#projectGrid').innerHTML = list.map(cardTemplate).join('');
     $('#emptyState').classList.toggle('hidden', list.length > 0);
-    $('#resultCount').textContent = state.query
-      ? `找到 ${list.length} 件作品`
-      : `共 ${list.length} 件作品`;
+    $('#resultCount').textContent = state.query ? `找到 ${list.length} 件作品` : `共 ${list.length} 件作品`;
   }
 
   function renderAll() {
@@ -190,78 +174,8 @@
     renderGrid();
   }
 
-  /* ---------------- 详情 ---------------- */
   function openDetail(id) {
-    const project = allProjects().find((p) => p.id === id);
-    if (!project) return;
-    state.detail = project;
-    state.shotIndex = 0;
-
-    $('#detailCat').textContent = project.category || '其他';
-    $('#detailName').textContent = project.name;
-    $('#detailTagline').textContent = project.tagline || '';
-    $('#detailPlatforms').innerHTML = (project.platforms || [])
-      .map((p) => `<span>${escapeHtml(p)}</span>`)
-      .join('');
-    $('#detailDesc').textContent = project.description || '';
-    $('#detailGameplay').innerHTML = (project.gameplay || [])
-      .map((item) => `<li>${escapeHtml(item)}</li>`)
-      .join('') || '<li>作者没有填写玩法说明。</li>';
-    $('#detailStack').innerHTML = (project.stack || [])
-      .map((s) => `<span>${escapeHtml(s)}</span>`)
-      .join('');
-
-    const contactParts = [];
-    if (project.contactName) contactParts.push(`<span>联系人 <b>${escapeHtml(project.contactName)}</b></span>`);
-    if (project.contact) {
-      const isUrl = /^https?:\/\//i.test(project.contact) || /^mailto:/i.test(project.contact);
-      contactParts.push(
-        `<span>联系方式 ${isUrl ? `<a href="${escapeHtml(project.contact)}" target="_blank" rel="noopener">${escapeHtml(project.contact)}</a>` : `<b>${escapeHtml(project.contact)}</b>`}</span>`
-      );
-    }
-    $('#detailContact').innerHTML = contactParts.join('') || '<span>作者未留下联系方式</span>';
-
-    const actions = [];
-    if (project.repo) {
-      actions.push(`<a class="btn primary" href="${escapeHtml(project.repo)}" target="_blank" rel="noopener">打开开源地址 ↗</a>`);
-    } else {
-      actions.push('<span class="btn ghost" style="cursor:default;opacity:.6">未提供开源地址</span>');
-    }
-    if (project.custom) {
-      actions.push('<button class="btn danger" type="button" id="deleteProject">删除</button>');
-    }
-    $('#detailActions').innerHTML = actions.join('');
-
-    renderShots();
-    openModal('#detailModal');
-  }
-
-  function renderShots() {
-    const project = state.detail;
-    if (!project) return;
-    const images = project.images || [];
-    const current = images[state.shotIndex] || images[0];
-    if (!current) return;
-    $('#detailMain').src = current.src;
-    $('#detailMain').alt = `${project.name} 截图 ${state.shotIndex + 1}`;
-    $('#detailLabel').textContent = current.label === 'mobile' ? '手机端' : 'PC 端';
-    $('#detailThumbs').innerHTML = images
-      .map(
-        (img, i) =>
-          `<button type="button" class="${i === state.shotIndex ? 'active' : ''}" data-shot="${i}" aria-label="第 ${i + 1} 张"><img src="${img.src}" alt=""></button>`
-      )
-      .join('');
-    const many = images.length > 1;
-    $('#prevShot').style.display = many ? '' : 'none';
-    $('#nextShot').style.display = many ? '' : 'none';
-  }
-
-  function stepShot(delta) {
-    if (!state.detail) return;
-    const total = (state.detail.images || []).length;
-    if (!total) return;
-    state.shotIndex = (state.shotIndex + delta + total) % total;
-    renderShots();
+    location.href = 'detail.html?id=' + encodeURIComponent(id);
   }
 
   /* ---------------- 弹层 ---------------- */
@@ -270,7 +184,7 @@
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    const focusable = modal.querySelector('button, [href], input, select, textarea');
+    const focusable = modal.querySelector('input, button, textarea');
     if (focusable) setTimeout(() => focusable.focus({ preventScroll: true }), 60);
   }
 
@@ -280,7 +194,6 @@
       modal.setAttribute('aria-hidden', 'true');
     });
     document.body.style.overflow = '';
-    state.detail = null;
   }
 
   /* ---------------- 提交表单 ---------------- */
@@ -290,8 +203,10 @@
     ).join('');
   }
 
-  function renderCategoryOptions() {
-    $('#fCategory').innerHTML = CATEGORIES.map((c) => `<option value="${c}">${c}</option>`).join('');
+  function renderCategoryChecks() {
+    $('#categoryChecks').innerHTML = CATEGORIES.map(
+      (c) => `<label><input type="checkbox" name="category" value="${escapeHtml(c)}">${escapeHtml(c)}</label>`
+    ).join('');
   }
 
   function resetForm() {
@@ -299,11 +214,11 @@
     state.draftShots = [];
     renderShotsDraft();
     renderPlatformChecks();
+    renderCategoryChecks();
   }
 
   function renderShotsDraft() {
-    const grid = $('#shotGrid');
-    grid.innerHTML = state.draftShots
+    $('#shotGrid').innerHTML = state.draftShots
       .map(
         (shot, i) => `
         <div class="shot" data-index="${i}">
@@ -370,6 +285,7 @@
     const form = $('#submitForm');
     const data = new FormData(form);
     const platforms = $$('input[name="platform"]:checked', form).map((el) => el.value);
+    const categories = $$('input[name="category"]:checked', form).map((el) => el.value);
     const stack = String(data.get('stack') || '')
       .split(/[,，、]/)
       .map((s) => s.trim())
@@ -380,13 +296,14 @@
       .filter(Boolean);
 
     if (!state.draftShots.length) throw new Error('至少上传 1 张截图');
+    if (!categories.length) throw new Error('至少选择一个分类');
     if (!platforms.length) platforms.push('Web');
 
     return {
       id: uid(),
       name: String(data.get('name') || '').trim(),
       tagline: String(data.get('tagline') || '').trim(),
-      category: String(data.get('category') || '其他').trim(),
+      categories,
       description: String(data.get('description') || '').trim(),
       gameplay,
       stack,
@@ -394,6 +311,7 @@
       repo: String(data.get('repo') || '').trim(),
       contactName: String(data.get('contactName') || '').trim(),
       contact: String(data.get('contact') || '').trim(),
+      qq: SITE.qq,
       cover: state.draftShots[0].src,
       images: state.draftShots.map((s) => ({ ...s })),
       createdAt: Date.now()
@@ -406,7 +324,7 @@
       toast('还没有自己提交的作品');
       return;
     }
-    const payload = { version: 1, exportedAt: new Date().toISOString(), projects: state.custom };
+    const payload = { version: 2, exportedAt: new Date().toISOString(), projects: state.custom };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -429,6 +347,11 @@
         const project = {
           ...item,
           id: item.id && !allProjects().some((p) => p.id === item.id) ? item.id : uid(),
+          categories: Array.isArray(item.categories) && item.categories.length
+            ? item.categories
+            : item.category
+              ? [item.category]
+              : ['其他'],
           platforms: Array.isArray(item.platforms) && item.platforms.length ? item.platforms : ['Web'],
           cover: item.cover || item.images[0].src,
           createdAt: item.createdAt || Date.now()
@@ -447,20 +370,11 @@
   /* ---------------- 事件 ---------------- */
   function bindEvents() {
     $('#navSubmit').addEventListener('click', () => openModal('#submitModal'));
-    $('#heroSubmit').addEventListener('click', () => openModal('#submitModal'));
 
     $('#categoryFilters').addEventListener('click', (event) => {
       const btn = event.target.closest('[data-category]');
       if (!btn) return;
       state.category = btn.dataset.category;
-      renderFilters();
-      renderGrid();
-    });
-
-    $('#platformFilters').addEventListener('click', (event) => {
-      const btn = event.target.closest('[data-platform]');
-      if (!btn) return;
-      state.platform = btn.dataset.platform;
       renderFilters();
       renderGrid();
     });
@@ -471,12 +385,11 @@
       searchTimer = setTimeout(() => {
         state.query = event.target.value;
         renderGrid();
-      }, 120);
+      }, 110);
     });
 
     $('#resetFilters').addEventListener('click', () => {
       state.category = '全部';
-      state.platform = '全部';
       state.query = '';
       $('#searchInput').value = '';
       renderAll();
@@ -497,33 +410,8 @@
     document.addEventListener('click', (event) => {
       if (event.target.closest('[data-close]')) closeModals();
     });
-
-    $('#detailThumbs').addEventListener('click', (event) => {
-      const btn = event.target.closest('[data-shot]');
-      if (!btn) return;
-      state.shotIndex = Number(btn.dataset.shot);
-      renderShots();
-    });
-    $('#prevShot').addEventListener('click', () => stepShot(-1));
-    $('#nextShot').addEventListener('click', () => stepShot(1));
-
-    $('#detailActions').addEventListener('click', async (event) => {
-      if (!event.target.closest('#deleteProject')) return;
-      const project = state.detail;
-      if (!project) return;
-      if (!confirm(`删除「${project.name}」？只删除浏览器里的这份提交。`)) return;
-      await removeCustom(project.id);
-      await loadCustom();
-      closeModals();
-      renderAll();
-      toast('已删除');
-    });
-
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') closeModals();
-      if (!$('#detailModal').classList.contains('open')) return;
-      if (event.key === 'ArrowLeft') stepShot(-1);
-      if (event.key === 'ArrowRight') stepShot(1);
     });
 
     $('#pickImages').addEventListener('click', () => $('#imageInput').click());
@@ -570,6 +458,14 @@
       }
     });
 
+    $('#categoryChecks').addEventListener('change', (event) => {
+      const checked = $$('input[name="category"]:checked');
+      if (checked.length > MAX_CATS) {
+        event.target.checked = false;
+        toast(`最多选 ${MAX_CATS} 个分类`);
+      }
+    });
+
     $('#submitForm').addEventListener('submit', async (event) => {
       event.preventDefault();
       try {
@@ -579,7 +475,7 @@
         resetForm();
         closeModals();
         renderAll();
-        toast('作品已发布，保存在本机浏览器');
+        toast('作品已发布，点击卡片查看详情页');
         const first = document.querySelector(`.card[data-id="${project.id}"]`);
         if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (error) {
@@ -610,7 +506,7 @@
   /* ---------------- 启动 ---------------- */
   async function init() {
     renderPlatformChecks();
-    renderCategoryOptions();
+    renderCategoryChecks();
     bindEvents();
     await loadCustom();
     renderAll();

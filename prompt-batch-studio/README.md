@@ -10,6 +10,10 @@
     <td width="50%"><img src="screenshots/pc-2.jpg" alt="自动生成项目"></td>
   </tr>
   <tr>
+    <td><img src="screenshots/pc-3.jpg" alt="PC 端截图 3"></td>
+    <td><img src="screenshots/pc-4.jpg" alt="PC 端截图 4"></td>
+  </tr>
+  <tr>
     <td><img src="screenshots/mobile-1.jpg" alt="手机窄屏生成面板"></td>
     <td><img src="screenshots/mobile-2.jpg" alt="手机端设置面板预览"></td>
   </tr>

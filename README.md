@@ -14,7 +14,7 @@
 | [批量提示词工作台](prompt-batch-studio/) | <img src="prompt-batch-studio/screenshots/pc-1.jpg" width="220"> | Windows 桌面工具：把「写需求 → 粘贴 → 等 AI 写完」整条队列自动化。 | Electron · UIAutomation |
 | [苔溪镇 · Mossbrook Village](xiaozhen/) | <img src="xiaozhen/screenshots/pc-1.jpg" width="220"> | 模块化中世纪小镇与程序化骨骼动画的第三人称漫步。 | three.js · GLTF |
 | [自动视频图文工坊](zidongtuwen/) | <img src="zidongtuwen/screenshots/pc-1.jpg" width="220"> | 文案 → 配图 → 配音 → 字幕 → 成片，本地运行的短视频流水线。 | Python · Flask · Selenium · ffmpeg |
-| [AI 造物馆](ai-showcase/) | <img src="ai-showcase/assets/projects/universe/pc-2.jpg" width="220"> | 作品展示站：分类、搜索、PC / 手机截图画廊，支持访客提交作品（最多 8 张）。 | 原生 HTML / CSS / JS |
+| [AI 造物馆](ai-showcase/) | <img src="ai-showcase/assets/projects/universe/pc-2.jpg" width="220"> | 作品展示站：14 个分类、四列作品墙、独立详情页，每件作品 4 张 PC + 2 张手机截图，支持访客提交。 | 原生 HTML / CSS / JS |
 
 ## 快速开始
 
@@ -53,8 +53,8 @@ ai-showcase/              AI 作品展示站
 
 ## 提交新项目
 
-1. 在根目录新建项目文件夹，补一个 README（介绍 / 玩法 / 技术栈 / 4 张截图）；
-2. 截图统一放在 `screenshots/pc-1.jpg`、`pc-2.jpg`、`mobile-1.jpg`、`mobile-2.jpg`；
+1. 在根目录新建项目文件夹，补一个 README（介绍 / 玩法 / 技术栈 / 6 张截图）；
+2. 截图统一放在 `screenshots/pc-1.jpg` 到 `pc-4.jpg`、`mobile-1.jpg`、`mobile-2.jpg`；
 3. 在 `ai-showcase/data/projects.js` 里加一条作品数据，把截图复制到 `ai-showcase/assets/projects/<slug>/`；
 4. 更新本 README 的项目表。
 
