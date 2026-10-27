@@ -40,8 +40,7 @@ const insert = db.prepare(`
   INSERT INTO projects
     (id, user_id, name, tagline, categories, platforms, description, gameplay, stack, repo,
      contact_name, contact, qq, cover, images, status, boost, created_at, reviewed_at)
-  VALUES (@id, @user_id, @name, @tagline, @categories, @platforms, @description, @gameplay, @stack, @repo,
-     @contact_name, @contact, @qq, @cover, @images, 'approved', @boost, @created_at, @created_at)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', ?, ?, ?)
   ON CONFLICT(id) DO UPDATE SET
     name=excluded.name, tagline=excluded.tagline, categories=excluded.categories, platforms=excluded.platforms,
     description=excluded.description, gameplay=excluded.gameplay, stack=excluded.stack, repo=excluded.repo,
@@ -51,25 +50,26 @@ const insert = db.prepare(`
 let index = 0;
 for (const project of projects) {
   const created = project.date ? new Date(`${project.date}T10:00:00+08:00`).getTime() : Date.now();
-  insert.run({
-    id: project.id,
-    user_id: authorId,
-    name: project.name,
-    tagline: project.tagline || '',
-    categories: JSON.stringify(project.categories || []),
-    platforms: JSON.stringify(project.platforms || []),
-    description: project.description || '',
-    gameplay: JSON.stringify(project.gameplay || []),
-    stack: JSON.stringify(project.stack || []),
-    repo: project.repo || '',
-    contact_name: project.contactName || '智纪元AD',
-    contact: project.contact || '',
-    qq: project.qq || '993739647',
-    cover: project.cover || project.images?.[0]?.src || '',
-    images: JSON.stringify(project.images || []),
-    boost: index < 2 ? 1 : 0,
-    created_at: created
-  });
+  insert.run(
+    project.id,
+    authorId,
+    project.name,
+    project.tagline || '',
+    JSON.stringify(project.categories || []),
+    JSON.stringify(project.platforms || []),
+    project.description || '',
+    JSON.stringify(project.gameplay || []),
+    JSON.stringify(project.stack || []),
+    project.repo || '',
+    project.contactName || '智纪元AD',
+    project.contact || '',
+    project.qq || '993739647',
+    project.cover || project.images?.[0]?.src || '',
+    JSON.stringify(project.images || []),
+    index < 2 ? 1 : 0,
+    created,
+    created
+  );
   index += 1;
   console.log(`写入作品：${project.name}`);
 }

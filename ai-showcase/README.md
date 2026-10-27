@@ -9,8 +9,10 @@
 ## 技术栈
 
 - 前端：原生 HTML / CSS / JavaScript，无框架、无构建步骤
-- 后端：Node.js + Express + better-sqlite3 + JWT（httpOnly cookie）+ multer + nodemailer
-- 数据：SQLite（`server/data/app.db`），图片存 `server/data/uploads/`
+- 后端：Node.js + Express + JWT（httpOnly cookie）+ multer + nodemailer
+- 数据：Node 内置 `node:sqlite`（无需编译原生模块），数据库在 `server/data/app.db`，图片存 `server/data/uploads/`
+
+> 环境要求：**Node.js 22.5+**（推荐 24）。启动脚本已带 `--experimental-sqlite`，不需要再装 `better-sqlite3`，也不需要 Visual Studio 编译工具链。
 
 ## 快速开始
 
@@ -114,7 +116,7 @@ server/
 
 ```bash
 npm install --omit=dev
-NODE_ENV=production PORT=3000 node server/index.js
+NODE_ENV=production PORT=3000 node --experimental-sqlite --disable-warning=ExperimentalWarning server/index.js
 ```
 
 建议前面加 Nginx 反代并启用 HTTPS，同时：
@@ -124,6 +126,17 @@ NODE_ENV=production PORT=3000 node server/index.js
 - 备份 `server/data/`（数据库与上传图片）
 
 GitHub 仓库里只保留源码与预置截图，`server/data/`、`.env`、`node_modules/` 都已排除。
+
+## 常见问题
+
+**启动报 `NODE_MODULE_VERSION` / `ERR_DLOPEN_FAILED`**
+旧版本用过 `better-sqlite3`，原生模块与当前 Node 版本不匹配。现在的版本已经改用 Node 内置 `node:sqlite`，删掉 `node_modules` 重新 `npm install` 即可。
+
+**启动报 `--experimental-sqlite` 不识别 / `node:sqlite` 找不到**
+Node 版本低于 22.5。升级到 Node 22.5+（推荐 24），或换用 `H:\node\node.exe` 这类较新的安装。
+
+**验证码收不到**
+未配置 SMTP 时验证码只会打印在服务端控制台，并在注册页提示（开发模式）。配置 `.env` 里的 SMTP 后才会真实发信。
 
 ## 许可
 

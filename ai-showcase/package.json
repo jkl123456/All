@@ -5,13 +5,15 @@
   "type": "module",
   "description": "AI 造物馆·智纪元 —— 带账号、审核与互动 AI 作品展示站",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "node --watch server/index.js",
-    "seed": "node server/seed.js"
+    "start": "node --experimental-sqlite --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --experimental-sqlite --disable-warning=ExperimentalWarning --watch server/index.js",
+    "seed": "node --experimental-sqlite --disable-warning=ExperimentalWarning server/seed.js"
+  },
+  "engines": {
+    "node": ">=22.5"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^11.7.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

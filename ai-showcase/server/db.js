@@ -1,14 +1,46 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { DATA_DIR, UPLOAD_DIR } from './config.js';
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-export const db = new Database(path.join(DATA_DIR, 'app.db'));
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+const raw = new DatabaseSync(path.join(DATA_DIR, 'app.db'));
+raw.exec('PRAGMA journal_mode = WAL');
+raw.exec('PRAGMA foreign_keys = ON');
+
+/** 把 node:sqlite 的语句包一层，补齐 better-sqlite3 风格的返回类型 */
+function wrapStatement(statement) {
+  return {
+    run: (...args) => {
+      const result = statement.run(...args);
+      return {
+        changes: Number(result.changes ?? 0),
+        lastInsertRowid: Number(result.lastInsertRowid ?? 0)
+      };
+    },
+    get: (...args) => statement.get(...args) ?? undefined,
+    all: (...args) => statement.all(...args)
+  };
+}
+
+export const db = {
+  prepare: (sql) => wrapStatement(raw.prepare(sql)),
+  exec: (sql) => raw.exec(sql),
+  pragma: (statement) => raw.exec('PRAGMA ' + statement),
+  transaction: (fn) => (...args) => {
+    raw.exec('BEGIN');
+    try {
+      const result = fn(...args);
+      raw.exec('COMMIT');
+      return result;
+    } catch (error) {
+      raw.exec('ROLLBACK');
+      throw error;
+    }
+  }
+};
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS users (
