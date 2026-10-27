@@ -24,10 +24,12 @@ python -m http.server 8899
 
 ## 部署到 GitHub Pages
 
-1. 把仓库推到 GitHub，在 Settings → Pages 里选择分支与 `/ai-showcase` 目录；
-2. 或者把 `ai-showcase/` 作为独立仓库的根目录发布。
+仓库自带 `.github/workflows/deploy-showcase.yml`，会把 `ai-showcase/` 单独发布：
 
-所有资源都是相对路径，不需要构建。
+1. 打开仓库 **Settings → Pages**，把 Source 切到 **GitHub Actions**；
+2. 推送到 `main`（或手动运行 workflow），站点会发布在 `https://<用户名>.github.io/All/`。
+
+也可以把 `ai-showcase/` 单独建一个仓库，根目录直接发布，不需要构建，也不需要 workflow。
 
 ## 收录作品
 
