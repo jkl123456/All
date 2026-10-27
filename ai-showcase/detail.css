@@ -443,6 +443,41 @@ body.detail-body { padding-bottom: 96px; }
 }
 .contact-box b { color: var(--ink); font-weight: 650; }
 .contact-box a { color: var(--accent-ink); }
+
+/* ---------------- 开源地址 ---------------- */
+.repo-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f7f8fc;
+}
+.repo-link {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--accent-ink);
+  word-break: break-all;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #c7cbf5;
+}
+.repo-link:hover { text-decoration-color: var(--accent); }
+.repo-copy {
+  flex: none;
+  padding: 3px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+.repo-copy:hover { color: var(--ink); border-color: #c7cbf5; }
+.repo-empty { font-size: 12px; color: var(--soft); }
 .side-card .btn { margin-top: 12px; }
 
 /* ---------------- 翻页 ---------------- */

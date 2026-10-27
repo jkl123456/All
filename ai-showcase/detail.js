@@ -169,6 +169,26 @@
     }
   }
 
+  function renderRepo(project) {
+    const box = $('#dRepoBox');
+    const url = String(project.repo || '').trim();
+    if (!url) {
+      box.innerHTML = '<span class="repo-empty">作者没有提供开源地址</span>';
+      return;
+    }
+    box.innerHTML = `
+      <a class="repo-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(url)}</a>
+      <button class="repo-copy" type="button" id="copyRepo">复制</button>`;
+    $('#copyRepo').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast('已复制开源地址');
+      } catch {
+        toast('复制失败，请手动选择地址');
+      }
+    });
+  }
+
   function render(project, all) {
     state.project = project;
     document.title = `${project.name} · AI 造物馆·智纪元`;
@@ -206,17 +226,7 @@
     $('#dSidePlatforms').innerHTML = (project.platforms || []).map((p) => `<span>${escapeHtml(p)}</span>`).join('');
     $('#dContact').innerHTML = renderContact(project);
 
-    const repo = $('#dRepo');
-    if (project.repo) {
-      repo.href = project.repo;
-      repo.style.opacity = '';
-      repo.style.pointerEvents = '';
-    } else {
-      repo.removeAttribute('href');
-      repo.textContent = '未提供开源地址';
-      repo.style.opacity = '0.55';
-      repo.style.pointerEvents = 'none';
-    }
+    renderRepo(project);
 
     updateCounts();
     renderPager(project, all);
