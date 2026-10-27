@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070f" />
+    <title>知域 · 知识图谱</title>
+    <meta
+      name="description"
+      content="知域是一个可交互的知识图谱，也是一条从青铜到王者的闯关路径。75 个知识点，每一关都是一块白板板书：老师一笔一笔画出来，由浅入深讲到用得上。横跨数理化、英语、生物、地理、历史、语文与程序员、设计师、厨师、建筑、渔民、农民等行业。"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='26' fill='%230b1220' stroke='%236be7ff' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%236be7ff'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles/main.css" />
+    <link rel="stylesheet" href="./styles/game.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="graph-canvas" aria-label="三维知识图谱"></canvas>
+      <div class="scene-vignette" aria-hidden="true"></div>
+      <div class="scene-grain" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <a class="brand" href="#" id="brand-home" aria-label="返回知识宇宙中心">
+          <span class="brand-orb"><i></i></span>
+          <span class="brand-text">
+            <strong>知域</strong>
+            <small>KNOWLEDGE ATLAS</small>
+          </span>
+        </a>
+
+        <div class="search-shell" id="search-shell">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5"></circle>
+            <path d="M16 16l4.2 4.2"></path>
+          </svg>
+          <input
+            id="search-input"
+            type="search"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="搜索学科、行业或知识点"
+            aria-label="搜索知识点"
+          />
+          <kbd>/</kbd>
+          <div class="search-results" id="search-results" hidden></div>
+        </div>
+
+        <div class="top-actions">
+          <div class="hud-stats" id="hud-stats"></div>
+          <button class="ghost-btn" id="btn-tour" aria-pressed="false">
+            <span class="dot-pulse"></span>自动漫游
+          </button>
+          <button class="ghost-btn" id="btn-reset-view">重置视角</button>
+        </div>
+      </header>
+
+      <nav class="tierbar" id="tierbar" aria-label="难度段位">
+        <div class="tierbar-inner">
+          <span class="tierbar-label">难度</span>
+          <div class="tier-track" id="tier-track"></div>
+        </div>
+      </nav>
+
+      <nav class="rail" id="rail" aria-label="知识领域导航"></nav>
+
+      <section class="intro" id="intro" aria-label="欢迎页">
+        <div class="intro-inner">
+          <p class="intro-kicker">INTERACTIVE · KNOWLEDGE · UNIVERSE</p>
+          <h1>知<span>域</span></h1>
+          <p class="intro-sub">把知识放回它诞生的地方</p>
+          <p class="intro-desc">
+            一座可以漫游的三维知识图谱。从真实的投篮、轮船、面包与梯田出发，
+            穿过公式与原理，抵达 14 个学科与行业的知识内核。
+          </p>
+          <div class="intro-stats">
+            <div><strong>14</strong><span>知识领域</span></div>
+            <div><strong>75</strong><span>核心知识点</span></div>
+            <div><strong>8</strong><span>段位关卡</span></div>
+          </div>
+          <button class="primary-btn" id="btn-enter">
+            进入知识宇宙<span class="arrow">→</span>
+          </button>
+          <p class="intro-note">从黑铁到王者 · 每关分幕演出，可改变量 · 通关得积分与星</p>
+        </div>
+        <div class="intro-words" aria-hidden="true">
+          <span>MATH</span><span>PHYSICS</span><span>CHEMISTRY</span><span>BIOLOGY</span>
+          <span>GEOGRAPHY</span><span>HISTORY</span><span>LANGUAGE</span><span>ENGLISH</span>
+          <span>CODE</span><span>DESIGN</span><span>CUISINE</span><span>ARCHITECTURE</span>
+        </div>
+      </section>
+
+      <aside class="panel" id="panel" aria-hidden="true">
+        <div class="panel-scroll" id="panel-content"></div>
+      </aside>
+
+      <div class="bottom-bar">
+        <div class="filters" id="filters" role="tablist" aria-label="领域筛选">
+          <button class="filter active" data-filter="all" role="tab" aria-selected="true">全部 <span>14</span></button>
+          <button class="filter" data-filter="academic" role="tab" aria-selected="false">学科 <span>8</span></button>
+          <button class="filter" data-filter="industry" role="tab" aria-selected="false">行业 <span>6</span></button>
+        </div>
+        <p class="hint"><span class="mouse"></span>拖拽旋转 · 滚轮缩放 · 点击星体</p>
+      </div>
+
+      <div class="tooltip" id="tooltip" hidden>
+        <span class="tooltip-kind" id="tooltip-kind"></span>
+        <strong id="tooltip-title"></strong>
+        <small id="tooltip-sub"></small>
+      </div>
+
+      <div class="loader" id="loader">
+        <div class="loader-ring"></div>
+        <p>正在点亮知识宇宙</p>
+      </div>
+
+      <div class="continue-cta" id="continue-cta"></div>
+      <div id="board-root"></div>
+      <div id="lesson-root"></div>
+      <div id="challenge-root"></div>
+
+      <noscript>请启用 JavaScript 以浏览知识宇宙。</noscript>
+    </div>
+    <script src="./dist/app.js"></script>
+  </body>
+</html>

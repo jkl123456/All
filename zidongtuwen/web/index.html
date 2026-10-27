@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>自动视频图文工坊 · 文案 → 配图 → 配音 → 成片</title>
+<link rel="stylesheet" href="/assets/style.css?v=20261024e" />
+</head>
+<body>
+<div class="offline hide" id="offlineBar">
+  <b>后端服务已断开</b>
+  <span>页面还在，但程序已经退出，任何按钮都不会有反应。请重新双击项目目录里的 <code>启动.bat</code>，然后刷新本页。</span>
+</div>
+<div class="app">
+
+  <!-- ============================ 左侧控制台 ============================ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">图</div>
+      <div class="brand-text">
+        <h1>自动视频图文工坊</h1>
+        <p>文案 · 配图 · 配音 · 成片</p>
+      </div>
+    </div>
+
+    <section class="sec">
+      <h2>创作模式</h2>
+      <div class="mode-switch">
+        <button class="mode-btn active" data-mode="image_text">
+          <span class="mode-ico">▣</span>
+          <span class="mode-title">图文成片</span>
+          <span class="mode-sub">图片 + 配音</span>
+        </button>
+        <button class="mode-btn" data-mode="video">
+          <span class="mode-ico">▶</span>
+          <span class="mode-title">视频成片</span>
+          <span class="mode-sub">视频 + 配音</span>
+        </button>
+      </div>
+      <p class="hint" id="modeHint">每行为：文案 + 图片 + 音频，自动合成为成片。</p>
+    </section>
+
+    <section class="sec">
+      <h2>自动化浏览器<span class="dot" id="browserDot"></span></h2>
+      <div class="row-line">
+        <span class="browser-text" id="browserText">未启动</span>
+        <button class="btn tiny" id="btnBrowser">启动浏览器</button>
+      </div>
+      <p class="hint">首次使用请在弹出的 Chrome 里登录豆包，登录状态会被记住，之后生图全自动。</p>
+    </section>
+
+    <section class="sec">
+      <h2>AI 自动推进</h2>
+      <label class="check"><input type="checkbox" id="aiGuide" /> 生成过程由 AI 监控并自动处理</label>
+      <p class="hint">DeepSeek 全程盯着豆包：等确认就自动回话，数量不够自动补图，失败先判断再决定重试还是中止。</p>
+    </section>
+
+    <section class="sec">
+      <h2>配图</h2>
+      <label class="field">
+        <span>风格补充提示词</span>
+        <textarea id="imageStyle" rows="4" placeholder="例如：真实感摄影、暖色调、浅景深…"></textarea>
+      </label>
+      <label class="check"><input type="checkbox" id="freshChat" /> 每次生成前新开对话（推荐）</label>
+      <label class="check"><input type="checkbox" id="reuseChat" /> 重新生成时沿用同一豆包会话（仅限当前任务）</label>
+      <label class="field slim">
+        <span>当前会话链接 <b id="chatUrlHint">未记录</b></span>
+        <input type="text" id="chatUrl" placeholder="生成后自动记录，可粘贴对话链接用于追溯" />
+      </label>
+      <label class="check"><input type="checkbox" id="videoAuto" /> 视频模式用「豆包」自动生成视频（实验性）</label>
+      <label class="check"><input type="checkbox" id="videoOneShot" /> 批量生视频一次性提交（全部图片 + 一条 @文件名 文案）</label>
+      <label class="check"><input type="checkbox" id="videoNoImage" /> 生视频不要求底图（直接用文案 + 人物设定生成）</label>
+    </section>
+
+    <section class="sec">
+      <h2>配音</h2>
+      <label class="field">
+        <span>音色</span>
+        <select id="voice">
+          <option value="longxiaochun_v2">龙小春 · 女声活泼</option>
+          <option value="longwan_v2">龙婉 · 女声温柔</option>
+          <option value="longyue_v2">龙悦 · 女声亲和</option>
+          <option value="longxiaoxia_v2">龙小夏 · 女声甜美</option>
+          <option value="longjing_v2">龙婧 · 女声知性</option>
+          <option value="longhua_v2">龙华 · 男声浑厚</option>
+          <option value="longshu_v2">龙书 · 男声沉稳</option>
+          <option value="longshuo_v2">龙硕 · 男声磁性</option>
+          <option value="longlaotie_v2">龙老铁 · 男声豪爽</option>
+          <option value="longzhe_v2">龙哲 · 男声成熟</option>
+          <option value="longtian_v2">龙天 · 男声阳光</option>
+          <option value="longsanshu">龙三叔 · 男声沉稳（经典）</option>
+        </select>
+      </label>
+      <div class="grid2">
+        <label class="field">
+          <span>语速</span>
+          <input type="number" id="speed" min="0.5" max="2" step="0.1" value="1" />
+        </label>
+        <label class="field">
+          <span>音量 <b id="volumeVal">80</b></span>
+          <input type="range" id="volume" min="0" max="100" value="80" />
+        </label>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>成片设置</h2>
+      <label class="field">
+        <span>画布</span>
+        <select id="canvas">
+          <option value="1080x1920">竖屏 9:16 · 1080×1920</option>
+          <option value="1920x1080">横屏 16:9 · 1920×1080</option>
+          <option value="1080x1080">方形 1:1 · 1080×1080</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>画面填充</span>
+        <select id="fill">
+          <option value="blur">模糊背景（推荐图文）</option>
+          <option value="cover">裁剪铺满</option>
+          <option value="black">黑色边框</option>
+          <option value="white">白色边框</option>
+        </select>
+      </label>
+      <div class="grid2">
+        <label class="field">
+          <span>无音频时静图时长（秒）</span>
+          <input type="number" id="defaultDur" min="1" max="30" step="0.5" value="3" />
+        </label>
+        <label class="field" title="豆包常用 5 / 10 / 15 秒档位">
+          <span>视频生成时长（秒）</span>
+          <input type="number" id="videoSeconds" min="2" max="60" step="1" value="10" />
+        </label>
+      </div>
+      <label class="field">
+        <span>成片文件名</span>
+        <input type="text" id="outName" value="成片" />
+      </label>
+      <label class="check"><input type="checkbox" id="zoom" /> 图片缓慢放大（Ken Burns）</label>
+      <label class="check"><input type="checkbox" id="useOriginalAudio" /> 视频用原声（不配音、不加字幕）</label>
+
+      <div class="bgm-line">
+        <span class="bgm-label">背景音乐</span>
+        <input type="file" id="bgmFile" accept="audio/*" hidden />
+        <button class="btn tiny" id="btnBgm">选择…</button>
+        <span class="bgm-name" id="bgmName">未选择</span>
+        <button class="btn tiny ghost" id="btnBgmClear" title="清除">×</button>
+      </div>
+      <label class="field slim">
+        <span>BGM 音量 <b id="bgmVolVal">20%</b></span>
+        <input type="range" id="bgmVolume" min="0" max="100" value="20" />
+      </label>
+    </section>
+
+    <details class="fold" id="subFold">
+      <summary>字幕 <span class="fold-hint" id="subHint">开</span></summary>
+      <div class="fold-body">
+        <label class="check"><input type="checkbox" id="subEnabled" /> 启用字幕（取每行文案）</label>
+        <label class="field"><span>字体</span><select id="subFont"></select></label>
+        <div class="grid2">
+          <label class="field"><span>字号（px）</span><input type="number" id="subSize" min="16" max="200" step="2" /></label>
+          <label class="field"><span>描边宽度</span><input type="number" id="subStrokeWidth" min="0" max="10" step="1" /></label>
+        </div>
+        <div class="grid2">
+          <label class="field"><span>文字颜色</span><input type="color" id="subColor" /></label>
+          <label class="field"><span>描边颜色</span><input type="color" id="subStrokeColor" /></label>
+        </div>
+        <div class="grid2">
+          <label class="field"><span>位置</span>
+            <select id="subPosition">
+              <option value="bottom">底部</option>
+              <option value="center">居中</option>
+              <option value="top">顶部</option>
+            </select>
+          </label>
+          <label class="field"><span>边距（px）</span><input type="number" id="subMargin" min="0" max="800" step="10" /></label>
+        </div>
+        <label class="check"><input type="checkbox" id="subSplit" /> 按句拆分显示</label>
+        <p class="hint">改完样式后点「拼接成片」才会生效，不用重新配音。</p>
+      </div>
+    </details>
+
+    <details class="fold" id="titleFold">
+      <summary>片头标题 <span class="fold-hint" id="titleHint">关</span></summary>
+      <div class="fold-body">
+        <label class="check"><input type="checkbox" id="titleEnabled" /> 启用片头标题</label>
+        <label class="check"><input type="checkbox" id="titleOverlay" /> 悬浮在视频开头（不加背景）</label>
+        <label class="field"><span>标题文字（可换行）</span><textarea id="titleText" rows="2" placeholder="例如：指鹿为马"></textarea></label>
+        <div class="grid2">
+          <label class="field"><span>时长（秒）</span><input type="number" id="titleDuration" min="1" max="20" step="0.5" /></label>
+          <label class="field"><span>背景色（仅独立片头）</span><input type="color" id="titleBg" /></label>
+        </div>
+        <label class="field"><span>字体</span><select id="titleFont"></select></label>
+        <div class="grid2">
+          <label class="field"><span>字号（px）</span><input type="number" id="titleSize" min="16" max="260" step="2" /></label>
+          <label class="field"><span>描边宽度</span><input type="number" id="titleStrokeWidth" min="0" max="10" step="1" /></label>
+        </div>
+        <div class="grid2">
+          <label class="field"><span>文字颜色</span><input type="color" id="titleColor" /></label>
+          <label class="field"><span>描边颜色</span><input type="color" id="titleStrokeColor" /></label>
+        </div>
+        <label class="field"><span>位置</span>
+          <select id="titlePosition">
+            <option value="center">居中</option>
+            <option value="top">顶部</option>
+            <option value="bottom">底部</option>
+          </select>
+        </label>
+      </div>
+    </details>
+
+    <section class="sec actions">
+      <button class="btn primary block" id="btnRunAll">一键全流程</button>
+      <div class="grid2">
+        <button class="btn" id="btnImages">批量生图</button>
+        <button class="btn" id="btnAudios">批量配音</button>
+      </div>
+      <button class="btn block hide" id="btnVideos">批量生视频（图片 → 视频）</button>
+      <button class="btn block hide" id="btnEpisodes">逐集生成全部剧集（跳过已生成）</button>
+      <button class="btn block" id="btnScanImages" title="从该会话开头一路滚到底部重新读取图片，不会重新生成、也不会新开对话">从当前会话重新获取图片（不重新生成）</button>
+      <button class="btn block hide" id="btnScanVideos" title="从最后一条批量文案往下查找会话里已经生成好的视频，只下载不重新生成">从当前会话获取视频（不重新生成）</button>
+      <button class="btn block" id="btnStitch">拼接成片</button>
+      <button class="btn ghost block hide" id="btnStop">停止任务</button>
+      <p class="hint">一键全流程会先检查素材：缺配图才补图 → 再按图片生成视频 → 配音 → 拼接。</p>
+    </section>
+
+    <section class="sec log-sec">
+      <h2>运行日志 <button class="link" id="btnClearLog">清空</button></h2>
+      <div class="log-box" id="logBox"></div>
+    </section>
+  </aside>
+
+  <!-- ============================ 右侧分镜 ============================ -->
+  <main class="main">
+    <header class="main-head">
+      <div class="head-left">
+        <h2>分镜列表</h2>
+        <span class="badge" id="rowCount">0 条</span>
+      </div>
+      <div class="head-right">
+        <button class="btn" id="btnAddRow">＋ 空白行</button>
+        <button class="btn primary-ghost" id="btnToggleImport">批量导入文案</button>
+        <button class="btn" id="btnToggleEpisode">批量导入剧集</button>
+        <button class="btn ghost" id="btnClear">清空</button>
+      </div>
+    </header>
+
+    <details class="char-panel" id="charPanel">
+      <summary>
+        <span class="char-title">人物设定</span>
+        <span class="char-hint" id="charHint">可添加多个，一张三视图即可</span>
+      </summary>
+      <div class="char-body">
+        <div class="char-list" id="charList"></div>
+        <div class="char-foot">
+          <button class="btn tiny" id="btnAddChar">＋ 添加人物 / 动物</button>
+          <span class="hint">上传一张包含正面/侧面/背面的三视图；文案出现名字时自动带入「@人物名 + @三视图 + 描述」。</span>
+        </div>
+      </div>
+    </details>
+
+    <div class="import-panel hide" id="episodePanel">
+      <div class="ep-file-line">
+        <input type="file" id="episodeFiles" accept=".txt,.md" multiple hidden />
+        <button class="btn tiny" id="btnPickEpisodes">选择分集文件…</button>
+        <span class="hint" id="episodeFileHint">未选择文件（支持一次选多个 txt，按文件名识别集号）</span>
+      </div>
+      <textarea id="episodeText" placeholder="也可以直接把整部剧粘贴在这里：支持「## 第 01 集 标题」分集；没有集头时按「每集段数」自动切分…"></textarea>
+      <div class="import-foot">
+        <label class="field slim ep-per"><span>每集段数</span><input type="number" id="episodePer" value="6" min="1" max="30" /></label>
+        <label class="check"><input type="checkbox" id="episodeReplace" /> 覆盖现有分镜</label>
+        <label class="check"><input type="checkbox" id="episodeKeepFirst" /> 现有分镜当做第一集</label>
+        <div class="spacer"></div>
+        <button class="btn ghost" id="btnEpisodeCancel">收起</button>
+        <button class="btn" id="btnImportEpisodes">仅导入</button>
+        <button class="btn primary" id="btnImportEpisodesRun">导入并开始逐集生成</button>
+      </div>
+      <p class="hint">导入后按集依次生成，已生成的会自动跳过；任务意外中断时每 5 分钟自动续生成，最多 3 次。</p>
+    </div>
+
+    <div class="import-panel hide" id="importPanel">
+      <textarea id="importText" placeholder="粘贴文案，每行一条，会自动生成对应分镜…"></textarea>
+      <div class="import-foot">
+        <label class="check"><input type="checkbox" id="replaceAll" /> 覆盖现有分镜</label>
+        <div class="spacer"></div>
+        <button class="btn ghost" id="btnImportCancel">收起</button>
+        <button class="btn primary" id="btnImport">导入</button>
+      </div>
+    </div>
+
+    <div class="progress hide" id="globalProgress">
+      <div class="progress-bar"><i></i></div>
+      <span class="progress-label"></span>
+    </div>
+
+    <div class="rows" id="rows">
+      <div class="empty" id="emptyState">
+        <div class="empty-ico">▤</div>
+        <h3>还没有分镜</h3>
+        <p>点击右上角「批量导入文案」，每行文案会自动生成一条分镜；<br />每行可单独生成/替换图片、视频、音频。</p>
+      </div>
+    </div>
+
+    <div class="result-card hide" id="resultCard">
+      <div class="result-head">
+        <h3>成片预览</h3>
+        <span class="result-meta" id="resultMeta"></span>
+      </div>
+      <video id="resultVideo" controls playsinline></video>
+      <p class="result-tip">修改字幕 / 片头样式后，重新点「拼接成片」即可生效，<b>不需要重新配音</b>（字幕是在合成时烧进画面的）。</p>
+      <div class="result-actions">
+        <a class="btn primary" id="resultDownload" download>下载成片</a>
+        <button class="btn" id="btnOpenFolder">打开输出文件夹</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal hide" id="modal">
+  <div class="modal-body">
+    <button class="modal-close" id="modalClose">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div class="toast hide" id="toast"></div>
+
+<script src="/assets/app.js?v=20261024e"></script>
+</body>
+</html>

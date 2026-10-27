@@ -1,0 +1,20 @@
+{
+  "name": "mossbrook-village",
+  "version": "1.0.0",
+  "description": "用 Medieval Village MegaKit 与 Modular Character Outfits 制作的第三人称小镇漫步游戏",
+  "main": "game/server.js",
+  "scripts": {
+    "start": "node game/server.js",
+    "assets": "node game/tools/stage-assets.js"
+  },
+  "keywords": [
+    "threejs",
+    "game",
+    "medieval-village"
+  ],
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "three": "^0.169.0"
+  }
+}

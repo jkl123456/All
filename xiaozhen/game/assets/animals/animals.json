@@ -1,0 +1,9 @@
+{
+  "deer": {
+    "clips": [
+      "Gallop",
+      "Idle",
+      "Walk"
+    ]
+  }
+}

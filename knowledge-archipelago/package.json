@@ -1,0 +1,21 @@
+{
+  "name": "knowledge-archipelago",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "知屿 · 知识群岛 — 把模拟经营、岛屿建造、锻造与跨学科学习结合起来的 3D 游戏",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "validate": "node scripts/validate-content.mjs",
+    "capture": "node scripts/capture-docs.mjs docs/screenshots"
+  },
+  "dependencies": {
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1",
+    "vite": "^5.4.11"
+  }
+}

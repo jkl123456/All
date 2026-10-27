@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0d2a2c" />
+    <meta name="description" content="知屿 · 知识群岛：在会生长的海岛上建造、锻造、耕种，也在一座座学科岛屿上解开问题，把知识变成真实的力量。" />
+    <script>
+      // 在首帧之前判断是否需要横向容器，避免竖屏标题闪一下。
+      (() => {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          if (params.has('landscape-frame') || params.has('no-shell')) return;
+          const touch = window.matchMedia?.('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+          const shortSide = Math.min(
+            window.innerWidth || window.screen?.width || 0,
+            window.innerHeight || window.screen?.height || 0,
+          );
+          if (touch && shortSide > 0 && shortSide <= 820) {
+            document.documentElement.classList.add('landscape-shell-pending');
+          }
+        } catch {
+          // 没有脚本能力时让正常布局继续。
+        }
+      })();
+    </script>
+    <style>
+      html.landscape-shell-pending body {
+        margin: 0;
+        overflow: hidden;
+        background: #06181a;
+      }
+      html.landscape-shell-pending #app {
+        visibility: hidden !important;
+      }
+    </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230e3537'/%3E%3Cpath d='M16 43c4-7 8-10 16-10s12 3 16 10' fill='none' stroke='%23e8c98a' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='23' r='7' fill='%23e8c98a'/%3E%3Cpath d='M12 48h40' stroke='%238cc9b8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <title>知屿 · 知识群岛</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="stage" aria-label="知识群岛 3D 世界"></div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="grain" aria-hidden="true"></div>
+
+      <div id="boot-screen" class="boot-screen">
+        <div class="boot-mark">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path class="boot-ring" d="M32 5 55 18v27L32 59 9 45V18z" />
+            <path class="boot-mark-line" d="M20 40c3-6 7-9 12-9s9 3 12 9M14 45h36M32 16v9M26 22c0-4 3-7 6-7s6 3 6 7" />
+          </svg>
+        </div>
+        <p class="boot-kicker">ARCHIPELAGO OF WISDOM</p>
+        <h1>知屿</h1>
+        <p id="boot-status" class="boot-status">正在让潮汐醒来…</p>
+        <div class="boot-progress"><span></span></div>
+      </div>
+
+      <div id="hud" class="hud is-hidden" aria-live="polite">
+        <header class="hud-top">
+          <div class="hud-location glass">
+            <div class="location-glyph" id="hud-location-icon">屿</div>
+            <div>
+              <p class="eyebrow" id="hud-day">第 1 日 · 春潮</p>
+              <h2 id="hud-location">栖云岛</h2>
+            </div>
+            <div class="time-chip">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>
+              <span id="hud-time">06:30</span>
+            </div>
+          </div>
+
+          <div class="hud-resources glass" id="hud-resources"></div>
+
+          <button class="hud-menu glass" id="btn-menu" type="button" aria-label="打开菜单">
+            <span></span><span></span><span></span>
+          </button>
+        </header>
+
+        <aside class="quest-tracker glass" id="quest-tracker"></aside>
+
+        <aside class="action-rail" id="action-rail">
+          <button class="rail-btn rail-btn--primary" data-action="build" type="button" title="建造 (B)">
+            <span class="rail-icon" data-icon="build"></span><span>建造</span><kbd>B</kbd>
+          </button>
+          <button class="rail-btn" data-action="expand" type="button" title="扩建岛屿 (G)">
+            <span class="rail-icon" data-icon="grow"></span><span>扩建</span><kbd>G</kbd>
+          </button>
+          <button class="rail-btn" data-action="study" type="button" title="去知识岛答题 (K)">
+            <span class="rail-icon" data-icon="spark"></span><span>学习</span><kbd>K</kbd>
+          </button>
+          <button class="rail-btn" data-action="map" type="button" title="群岛海图 (M)">
+            <span class="rail-icon" data-icon="map"></span><span>海图</span><kbd>M</kbd>
+          </button>
+          <button class="rail-btn" data-action="bag" type="button" title="行囊 (I)">
+            <span class="rail-icon" data-icon="bag"></span><span>行囊</span><kbd>I</kbd>
+          </button>
+          <button class="rail-btn" data-action="journal" type="button" title="手记 (Q)">
+            <span class="rail-icon" data-icon="quest"></span><span>手记</span><kbd>Q</kbd>
+          </button>
+          <button class="rail-btn" data-action="time" type="button" title="时光快进 6 小时 (T)">
+            <span class="rail-icon" data-icon="clock"></span><span>时光</span><kbd>T</kbd>
+          </button>
+          <button class="rail-btn" data-action="codex" type="button" title="知海 (J)">
+            <span class="rail-icon" data-icon="book"></span><span>知海</span><kbd>J</kbd>
+          </button>
+        </aside>
+
+        <div class="hud-vitals">
+          <div class="energy-orb" id="energy-orb" title="精力">
+            <svg viewBox="0 0 48 48"><circle class="orb-track" cx="24" cy="24" r="20"/><circle id="energy-ring" class="orb-fill" cx="24" cy="24" r="20"/></svg>
+            <span data-icon="energy"></span>
+            <strong id="hud-energy">100</strong>
+          </div>
+          <div class="vital-copy">
+            <span>精力</span>
+            <small id="hud-energy-label">状态很好</small>
+          </div>
+        </div>
+
+        <div class="compass-wrap glass" id="compass-wrap">
+          <canvas id="minimap" width="184" height="184"></canvas>
+          <div class="compass-n">N</div>
+          <p id="hud-coordinates">栖云岛 · 中央营地</p>
+        </div>
+
+        <div class="interaction-prompt is-hidden" id="interaction-prompt">
+          <kbd>E</kbd>
+          <div><small id="interaction-hint">靠近可交互</small><strong id="interaction-label">查看</strong></div>
+        </div>
+
+        <div class="control-hint glass" id="control-hint">
+          <span><b>W A S D</b> 行走</span><span><b>Shift</b> 奔跑</span><span><b>拖拽</b> 环视</span><span><b>滚轮</b> 远近</span><span><b>E</b> 互动</span><span><b>T</b> 快进 6 小时</span><span><b>H</b> 隐藏界面</span>
+          <button id="dismiss-hint" type="button" aria-label="收起操作提示">×</button>
+        </div>
+
+        <div class="season-ribbon" aria-hidden="true">
+          <span>风起时，知识会靠岸</span>
+        </div>
+
+        <div class="touch-controls is-hidden" id="touch-controls">
+          <div class="joystick" id="joystick"><div class="joystick-knob" id="joystick-knob"></div></div>
+          <div class="touch-cluster">
+            <button class="touch-action touch-action--build" id="touch-build" type="button">建造</button>
+            <button class="touch-action" id="touch-interact" type="button">互动</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="title-screen" class="title-screen is-hidden">
+        <div class="title-topbar">
+          <div class="mini-brand"><span>知屿</span><small>ARCHIPELAGO OF WISDOM</small></div>
+          <div class="title-top-actions">
+            <button class="ghost-btn" id="btn-sound-title" type="button"><span data-icon="sound"></span><span>声音</span></button>
+            <button class="ghost-btn" id="btn-credits" type="button">制作手记</button>
+          </div>
+        </div>
+        <div class="title-main">
+          <div class="title-copy">
+            <p class="title-kicker"><span></span> 一座会生长的知识群岛 <span></span></p>
+            <h1>知屿</h1>
+            <p class="title-en">ARCHIPELAGO<br />OF WISDOM</p>
+            <p class="title-lede">潮水送你来此。修屋、耕种、锻一把剑，也解开风里藏着的谜。知识不只是答案，它会变成桥、成为灯，让荒岛慢慢住满人。</p>
+            <div class="title-rule"><span></span><i>✦</i><span></span></div>
+            <div class="title-actions" id="title-actions"></div>
+            <p class="title-footnote" id="title-footnote">每一次提问，都是岛上的一束微光</p>
+          </div>
+          <div class="title-side">
+            <div class="postcard">
+              <div class="postcard-wash"></div>
+              <div class="postcard-stamp">栖<br />云</div>
+              <p>“别急着把所有问题都答对。<br />先听听这座岛，想问什么。”</p>
+              <small>—— 守岛人 · 阿岚</small>
+              <div class="postcard-sign">ISLE 01</div>
+            </div>
+            <div class="title-quote">
+              <span class="quote-mark">“</span>
+              <p>我们建造房屋，也被问题建造。</p>
+            </div>
+          </div>
+        </div>
+        <div class="title-bottom">
+          <ul class="title-features">
+            <li><span data-icon="island"></span><div><b>七座学科岛屿</b><small>语文 · 数学 · 物理 · 化学 · 生物 · 英语 · 百工</small></div></li>
+            <li><span data-icon="hammer"></span><div><b>亲手建造与锻造</b><small>从木棚到观星台，从石斧到星辉器</small></div></li>
+            <li><span data-icon="grow"></span><div><b>让荒岛住满人</b><small>耕种、交易、结识愿意留下的旅人</small></div></li>
+          </ul>
+          <p class="version-mark">v1.0 · 潮声纪</p>
+        </div>
+      </div>
+
+      <div id="overlay-root" class="overlay-root"></div>
+      <div id="toast-stack" class="toast-stack" aria-live="assertive"></div>
+      <div id="transition" class="scene-transition is-hidden">
+        <div class="transition-sea"></div>
+        <div class="transition-boat">
+          <svg viewBox="0 0 180 120" aria-hidden="true">
+            <path d="M23 77h135l-22 23H46z" fill="#553a28" />
+            <path d="M34 74h112l-9 8H43z" fill="#ce8e54" />
+            <path d="M90 20v54" stroke="#5c402e" stroke-width="4" />
+            <path d="M92 25c21 9 35 21 41 35H92z" fill="#f1dfbb" />
+            <path d="M86 32 54 59h32z" fill="#e7c384" />
+            <path d="m34 97 111-2" stroke="#ebd8ac" stroke-width="2" opacity=".45" />
+          </svg>
+        </div>
+        <p id="transition-title">正在驶向…</p>
+        <small id="transition-sub">把陆地的声音留在身后</small>
+      </div>
+
+      <div id="build-dock" class="build-dock is-hidden"></div>
+      <div id="mobile-nav" class="mobile-nav is-hidden"></div>
+
+      <div id="fatal-error" class="fatal-error is-hidden"></div>
+    </div>
+    <script type="module" src="/src/bootstrap.js"></script>
+  </body>
+</html>

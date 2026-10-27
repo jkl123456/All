@@ -1,0 +1,13 @@
+﻿node_modules/
+dist/
+.shots/
+.vite/
+*.log
+.DS_Store
+
+# 3D 素材源包（运行时只需要 public/models 中转换后的 GLB）
+mox/
+docs/shots-port/
+
+# 临时脚本与调试截图
+.tmp*

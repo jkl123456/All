@@ -1,0 +1,11 @@
+# 依赖
+node_modules/
+dist/
+
+# 运行时数据：项目队列、附件副本、日志
+projects/
+*.log
+
+# 系统
+.DS_Store
+Thumbs.db

@@ -1,0 +1,17 @@
+{
+  "name": "knowledge-universe-3d",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "知域 · 3D 知识宇宙：用可交互的三维案例讲解跨学科与行业知识点",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "start": "node server.js",
+    "dev": "node build.mjs && node server.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2",
+    "three": "0.169.0"
+  }
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Car Lineup</title>
+<style>html,body{margin:0;background:#0f1216;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/",
+  "three/examples/jsm/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import { preloadCarModels, createCarBody } from '/src/carasset.js';
+
+const W = 1600, H = 900;
+const canvas = document.getElementById('c');
+canvas.width = W; canvas.height = H;
+canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H, false);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x14181e);
+scene.fog = new THREE.Fog(0x14181e, 26, 60);
+
+scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x22262c, 2.0));
+const key = new THREE.DirectionalLight(0xfff2e0, 3.0);
+key.position.set(6, 12, 8);
+key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xaac4ff, 1.2);
+fill.position.set(-8, 5, -6);
+scene.add(fill);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x2a2f36, roughness: 0.85 }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+await preloadCarModels();
+
+const ROWS = [
+  { style: 'gt3', paints: ['#1d34a4', '#d9d5cc', '#f06a2b'], desat: [0, 0.42, 0.42] },
+  { style: 'lm', paints: ['#e7e3d8', '#2b6b62', '#7a6ad8'], desat: [0, 0.42, 0.42] },
+];
+let tris = 0;
+ROWS.forEach((row, r) => {
+  row.paints.forEach((paint, i) => {
+    const car = createCarBody(row.style, paint, { desat: row.desat[i] });
+    if (!car) return;
+    car.position.set((i - 1) * 3.1, 0, r === 0 ? 2.6 : -2.6);
+    car.rotation.y = -0.55;
+    car.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; tris += o.geometry.index ? o.geometry.index.count / 3 : o.geometry.attributes.position.count / 3; } });
+    scene.add(car);
+  });
+});
+
+const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 200);
+camera.position.set(7.5, 4.2, 9.5);
+camera.lookAt(0, 0.5, 0);
+renderer.render(scene, camera);
+console.log('tris ' + Math.round(tris));
+document.title = 'ready';
+</script>
+</body>
+</html>

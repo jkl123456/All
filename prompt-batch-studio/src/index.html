@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data: media: blob:; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>批量提示词工作台</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="titlebar">
+      <div class="brand">
+        <span class="logo">◈</span>
+        <span class="brand-name">批量提示词工作台</span>
+        <span class="brand-sub">PROMPT BATCH STUDIO</span>
+      </div>
+      <div class="titlebar-right">
+        <button class="ghost-btn" id="btnResetStatus" title="把所有项目状态重置为待执行">重置状态</button>
+        <button class="ghost-btn" id="btnOpenData" title="打开数据目录">数据目录</button>
+        <button class="ghost-btn" id="btnSettings" title="设置目标软件与执行参数">⚙ 设置</button>
+        <div class="win-controls">
+          <button id="btnMin" title="最小化">─</button>
+          <button id="btnMax" title="最大化">▢</button>
+          <button id="btnClose" class="close" title="关闭">✕</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="body">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <span>项目队列</span>
+          <span class="count" id="projectCount">0</span>
+        </div>
+        <div class="project-list" id="projectList"></div>
+        <div class="sidebar-foot">
+          <button class="btn-add" id="btnAddProject">＋ 新建项目</button>
+          <button class="btn-preset" id="btnOpenPresets">✨ 自动生成项目</button>
+          <div class="sidebar-tip">勾选的项目将按顺序批量执行</div>
+        </div>
+      </aside>
+
+      <section class="editor" id="editor"></section>
+
+      <aside class="runpanel">
+        <div class="panel-title">执行控制</div>
+        <div id="runStatus" class="run-status"></div>
+        <div id="runProgress" class="run-progress-wrap"></div>
+        <div id="runButtons" class="run-buttons"></div>
+
+        <div class="panel-title with-action">
+          <span>运行日志</span>
+          <button class="link" id="btnClearLog">清空</button>
+        </div>
+        <div class="log" id="logList"></div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>设置</h2>
+        <button class="icon-x" id="btnCloseSettings">✕</button>
+      </div>
+      <div class="modal-body" id="settingsBody"></div>
+      <div class="modal-foot">
+        <button class="ghost-btn" id="btnTestTarget">测试连接目标窗口</button>
+        <div class="spacer"></div>
+        <button class="ghost-btn" id="btnCancelSettings">取消</button>
+        <button class="primary-btn" id="btnSaveSettings">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="presetModal">
+    <div class="modal-card preset-card">
+      <div class="modal-head">
+        <div>
+          <h2>✨ 自动生成项目</h2>
+          <div class="modal-sub">勾选要生成的项目（默认按数量勾前 N 个，可逐个改）· 技术栈不限定，游戏支持键鼠/触屏/手柄</div>
+        </div>
+        <button class="icon-x" id="btnClosePresets">✕</button>
+      </div>
+      <div class="preset-tabs" id="presetTabs"></div>
+      <div class="preset-config">
+        <span class="cfg-label">勾选数量</span>
+        <input class="cfg-input" id="presetCountInput" type="number" min="1" max="30" value="10" />
+        <div class="cfg-quick" id="presetQuick">
+          <button data-n="5">5</button>
+          <button data-n="10">10</button>
+          <button data-n="15">15</button>
+          <button data-n="all">全部</button>
+        </div>
+        <div class="spacer"></div>
+        <button class="ghost-btn" id="btnReshuffle">🎲 换一批</button>
+      </div>
+      <div class="modal-body preset-body" id="presetBody"></div>
+      <div class="modal-foot">
+        <span class="preset-count" id="presetCount">将生成 0 个项目</span>
+        <div class="spacer"></div>
+        <button class="ghost-btn" id="btnCancelPresets">取消</button>
+        <button class="primary-btn" id="btnGenerateProjects">生成项目</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="presets.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

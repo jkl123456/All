@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# 运行时数据：浏览器配置、成片、缓存、日志
+data/
+_server.log
+*.log
+
+# 本地配置（含 API Key，请复制 config.example.json 后自行填写）
+config.json
+
+# 系统
+.DS_Store
+Thumbs.db

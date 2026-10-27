@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 造物馆 · AI Maker Gallery</title>
+<meta name="description" content="收集用 AI 开发的小软件、游戏与工具。看截图、读介绍、点进开源地址。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230f1222'/%3E%3Cpath d='M16 7l7 9-7 9-7-9z' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="orb orb-a" aria-hidden="true"></div>
+<div class="orb orb-b" aria-hidden="true"></div>
+
+<header class="nav">
+  <a class="brand" href="#top">
+    <span class="brand-mark">◇</span>
+    <span class="brand-text">AI 造物馆<small>AI MAKER GALLERY</small></span>
+  </a>
+  <nav class="nav-links">
+    <a href="#gallery">作品墙</a>
+    <a href="#about">关于</a>
+    <button class="nav-cta" id="navSubmit" type="button">提交作品</button>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <p class="eyebrow">COMMUNITY SHOWCASE</p>
+    <h1>把 AI 做出来的东西<br><span>摆出来给人看</span></h1>
+    <p class="lede">这里收集用 AI 开发的小软件、游戏与工具。不需要源码，只要几张截图、一段介绍和技术栈，外加一个可以点进去的开源地址。</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#gallery">浏览作品</a>
+      <button class="btn ghost" id="heroSubmit" type="button">上传我的作品</button>
+    </div>
+    <dl class="stats">
+      <div><dt id="statProjects">—</dt><dd>作品</dd></div>
+      <div><dt id="statShots">—</dt><dd>截图</dd></div>
+      <div><dt id="statCats">—</dt><dd>分类</dd></div>
+    </dl>
+  </section>
+
+  <section class="gallery" id="gallery">
+    <div class="section-head">
+      <div>
+        <h2>作品墙</h2>
+        <p id="resultCount">共 0 件作品</p>
+      </div>
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path>
+        </svg>
+        <input id="searchInput" type="search" placeholder="搜索作品、技术栈、分类" autocomplete="off">
+      </label>
+    </div>
+
+    <div class="filters">
+      <div class="filter-group" id="categoryFilters" role="tablist" aria-label="分类筛选"></div>
+      <div class="filter-group" id="platformFilters" role="tablist" aria-label="平台筛选"></div>
+    </div>
+
+    <div class="grid" id="projectGrid"></div>
+    <div class="empty hidden" id="emptyState">
+      <p>没有找到匹配的作品</p>
+      <button class="btn ghost" id="resetFilters" type="button">清除筛选</button>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="about-card">
+      <div>
+        <p class="eyebrow">ABOUT</p>
+        <h2>这是一个只放作品的展馆</h2>
+        <p>不上传源码，不跑在线 Demo。每件作品只保留最少的信息：几张 PC / 手机截图、一段介绍、玩法与技术栈，以及作者留下的开源地址和联系方式。</p>
+        <p>新作品保存在你自己的浏览器里（IndexedDB），可以随时导出 JSON 交给站长收录，或导入别人分享的作品包。</p>
+      </div>
+      <div class="about-actions">
+        <button class="btn ghost" id="exportBtn" type="button">导出我的作品</button>
+        <button class="btn ghost" id="importBtn" type="button">导入作品 JSON</button>
+        <input type="file" id="importInput" accept="application/json" hidden>
+        <button class="btn danger" id="clearMine" type="button">清空我的提交</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>AI 造物馆 · 用 AI 做的东西值得被看见</span>
+  <span id="footerCount"></span>
+</footer>
+
+<!-- 作品详情 -->
+<div class="modal" id="detailModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="detail" role="dialog" aria-modal="true" aria-labelledby="detailName">
+    <button class="icon-btn close" type="button" data-close aria-label="关闭">✕</button>
+    <div class="detail-media">
+      <div class="stage">
+        <img id="detailMain" alt="">
+        <button class="stage-nav prev" type="button" id="prevShot" aria-label="上一张">‹</button>
+        <button class="stage-nav next" type="button" id="nextShot" aria-label="下一张">›</button>
+        <span class="label-badge" id="detailLabel">PC</span>
+      </div>
+      <div class="thumbs" id="detailThumbs"></div>
+    </div>
+    <div class="detail-info">
+      <div class="detail-head">
+        <span class="cat" id="detailCat"></span>
+        <h2 id="detailName"></h2>
+        <p class="tagline" id="detailTagline"></p>
+        <div class="platform-row" id="detailPlatforms"></div>
+      </div>
+      <div class="block"><h3>介绍</h3><p id="detailDesc"></p></div>
+      <div class="block"><h3>玩法 / 功能</h3><ul id="detailGameplay"></ul></div>
+      <div class="block"><h3>技术栈</h3><div class="chips" id="detailStack"></div></div>
+      <div class="block contact" id="detailContact"></div>
+      <div class="detail-actions" id="detailActions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 提交作品 -->
+<div class="modal" id="submitModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <form class="submit-panel" id="submitForm" role="dialog" aria-modal="true" aria-labelledby="submitTitle">
+    <header class="submit-head">
+      <div>
+        <p class="eyebrow">SUBMIT</p>
+        <h2 id="submitTitle">上传作品</h2>
+      </div>
+      <button class="icon-btn" type="button" data-close aria-label="关闭">✕</button>
+    </header>
+
+    <div class="form-body">
+      <div class="grid-2">
+        <div class="field"><label for="fName">作品名称 <i>*</i></label><input id="fName" name="name" required maxlength="60" placeholder="例如：知屿 · 知识群岛"></div>
+        <div class="field"><label for="fCategory">分类 <i>*</i></label><select id="fCategory" name="category" required></select></div>
+      </div>
+      <div class="field"><label for="fTagline">一句话简介 <i>*</i></label><input id="fTagline" name="tagline" required maxlength="80" placeholder="一句话说清它是什么"></div>
+      <div class="field"><label for="fDesc">介绍 <i>*</i></label><textarea id="fDesc" name="description" rows="3" required placeholder="它解决什么问题、怎么玩、有什么特别的地方"></textarea></div>
+      <div class="field"><label for="fGameplay">玩法 / 功能 <span>每行一条</span></label><textarea id="fGameplay" name="gameplay" rows="3" placeholder="支持哪些操作&#10;有哪些模式&#10;有什么限制"></textarea></div>
+      <div class="field"><label for="fStack">技术栈 <span>用逗号分隔</span></label><input id="fStack" name="stack" placeholder="three.js, Vite, WebGL"></div>
+
+      <div class="field">
+        <label>平台</label>
+        <div class="check-row" id="platformChecks"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field"><label for="fRepo">开源地址 <span>选填</span></label><input id="fRepo" name="repo" type="url" placeholder="https://github.com/..."></div>
+        <div class="field"><label for="fContactName">联系人 <span>选填</span></label><input id="fContactName" name="contactName" maxlength="40" placeholder="昵称或名字"></div>
+      </div>
+      <div class="field"><label for="fContact">联系方式 <span>选填</span></label><input id="fContact" name="contact" maxlength="120" placeholder="邮箱 / 主页 / 微信"></div>
+
+      <div class="field">
+        <label>项目截图 <i>*</i> <span>最多 8 张，PC 与手机端都可以，上传后可切换标注</span></label>
+        <div class="uploader" id="dropZone">
+          <input type="file" id="imageInput" accept="image/*" multiple hidden>
+          <button class="upload-cta" type="button" id="pickImages">
+            <strong>点击或拖拽图片到这里</strong>
+            <span>支持 JPG / PNG / WebP，自动压缩，最多 8 张</span>
+          </button>
+          <div class="shot-grid" id="shotGrid"></div>
+          <div class="upload-count" id="uploadCount">0 / 8</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="submit-foot">
+      <p>作品保存在本机浏览器（IndexedDB），不会自动上传服务器。可在「关于」里导出 JSON 交给站长收录。</p>
+      <div class="foot-actions">
+        <button class="btn ghost" type="button" data-close>取消</button>
+        <button class="btn primary" type="submit">发布作品</button>
+      </div>
+    </footer>
+  </form>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="data/projects.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

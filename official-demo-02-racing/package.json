@@ -1,0 +1,17 @@
+{
+  "name": "apex-city-official-demo-02",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "APEX CITY · 极速都市 — 官方演示 02，程序化实时 3D 城市赛车游戏",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "start": "node server.js",
+    "dev": "node build.mjs && node server.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2",
+    "three": "0.169.0"
+  }
+}

@@ -1,0 +1,21 @@
+node_modules/
+package-lock.json
+server.log
+server.err.log
+test-*.png
+ui-*.png
+race-*.png
+scout-*.png
+mobile-*.png
+menu-scout-*.png
+file-menu.png
+final-menu-*.png
+full-out.txt
+scripts/
+tools/out/
+dist/
+tools/out/
+preview-*.png
+
+# 腾讯混元任务回执（含 COS 预签名 URL）
+tools/job-*.json

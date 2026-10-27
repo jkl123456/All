@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>GLB Inspector</title>
+<style>
+  html,body{margin:0;background:#14161a;color:#cfd6e2;font:12px/1.4 system-ui}
+  #c{display:block}
+  #hud{position:fixed;left:8px;top:6px;font:12px ui-monospace,monospace;white-space:pre;color:#8fa0b8}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const params = new URLSearchParams(location.search);
+const file = params.get('m') || '/tools/out/car01.glb';
+const W = 1440, H = 960;
+const canvas = document.getElementById('c');
+canvas.width = W; canvas.height = H;
+canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H, false);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1b1f26);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x30363f, 2.2));
+const k = new THREE.DirectionalLight(0xffffff, 2.2); k.position.set(2, 3, 2.5); scene.add(k);
+const f = new THREE.DirectionalLight(0xffffff, 1.0); f.position.set(-3, 1.5, -2); scene.add(f);
+
+const gltf = await new GLTFLoader().loadAsync(file);
+const car = gltf.scene;
+scene.add(car);
+car.updateMatrixWorld(true);
+
+// 可选：非等比缩放到目标尺寸（长度 z / 宽度 x / 高度 y，单位米）
+const fit = params.get('fit');
+if (fit) {
+  const [L, Wd, Hh] = fit.split(',').map(Number);
+  const b0 = new THREE.Box3().setFromObject(car);
+  const s0 = b0.getSize(new THREE.Vector3());
+  const c0 = b0.getCenter(new THREE.Vector3());
+  car.position.set(-c0.x, -b0.min.y, -c0.z);
+  car.scale.set(Wd / s0.x, Hh / s0.y, L / s0.z);
+  // 包围盒参考线
+  const ref = new THREE.Mesh(
+    new THREE.BoxGeometry(Wd, Hh, L),
+    new THREE.MeshBasicMaterial({ color: 0x33ff99, wireframe: true, transparent: true, opacity: 0.35 }),
+  );
+  ref.position.set(0, Hh / 2, 0);
+  scene.add(ref);
+}
+car.updateMatrixWorld(true);
+
+const box = new THREE.Box3().setFromObject(car);
+const size = box.getSize(new THREE.Vector3());
+const center = box.getCenter(new THREE.Vector3());
+let tris = 0, meshes = 0, verts = 0, mats = new Set();
+car.traverse(o => { if (o.isMesh) { meshes++; const g = o.geometry; verts += g.attributes.position.count; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; mats.add(o.material.uuid); } });
+document.getElementById('hud').textContent =
+  `file  ${file}\n` +
+  `bbox  ${size.x.toFixed(3)} x ${size.y.toFixed(3)} x ${size.z.toFixed(3)}  (x,y,z)\n` +
+  `min   ${box.min.x.toFixed(3)} ${box.min.y.toFixed(3)} ${box.min.z.toFixed(3)}\n` +
+  `max   ${box.max.x.toFixed(3)} ${box.max.y.toFixed(3)} ${box.max.z.toFixed(3)}\n` +
+  `mesh  ${meshes}   verts ${verts}   tris ${Math.round(tris)}   materials ${mats.size}`;
+console.log(JSON.stringify({ size: size.toArray(), min: box.min.toArray(), max: box.max.toArray(), meshes, verts, tris }));
+
+// 6 orthographic views in a 3x2 grid
+const r = Math.max(size.x, size.y, size.z) * 0.62;
+const views = [
+  { name: '+Z', dir: [0, 0, 1], up: [0, 1, 0] },
+  { name: '-Z', dir: [0, 0, -1], up: [0, 1, 0] },
+  { name: '+X', dir: [1, 0, 0], up: [0, 1, 0] },
+  { name: '+Y', dir: [0, 1, 0], up: [0, 0, -1] },
+  { name: '-Y', dir: [0, -1, 0], up: [0, 0, 1] },
+  { name: 'iso', dir: [1, 0.55, 1], up: [0, 1, 0] },
+];
+const cw = W / 3, ch = H / 2;
+renderer.setScissorTest(true);
+views.forEach((v, i) => {
+  const col = i % 3, row = Math.floor(i / 3);
+  const x = col * cw, y = H - (row + 1) * ch;
+  renderer.setViewport(x, y, cw, ch);
+  renderer.setScissor(x, y, cw, ch);
+  const cam = new THREE.OrthographicCamera(-r, r, r * (ch / cw), -r * (ch / cw), 0.01, 100);
+  const d = new THREE.Vector3(...v.dir).normalize();
+  cam.position.copy(center).addScaledVector(d, 10);
+  cam.up.set(...v.up);
+  cam.lookAt(center);
+  renderer.render(scene, cam);
+});
+document.title = 'ready';
+</script>
+</body>
+</html>

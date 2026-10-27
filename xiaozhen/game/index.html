@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0d0a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>苔溪镇 · Mossbrook Village</title>
+  <link
+    rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23141912'/%3E%3Cpath d='M12 3 5 6.5v5c0 4.2 2.9 7.4 7 8.5 4.1-1.1 7-4.3 7-8.5v-5L12 3Z' fill='none' stroke='%23e7c78b' stroke-width='1.5'/%3E%3C/svg%3E"
+  />
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <canvas id="scene"></canvas>
+    <div class="grade"></div>
+    <div class="vignette"></div>
+
+    <header class="hud-top">
+      <div class="title-block">
+        <div class="crest">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M8 10.5 12 8l4 2.5v5h-1.6v-4.2L12 9.7l-2.4 1.6v4.2H8v-5Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="title-text">
+          <h1>苔溪镇</h1>
+          <p>MOSSBROOK VILLAGE</p>
+        </div>
+      </div>
+
+      <div class="minimap-panel">
+        <div class="minimap-frame">
+          <canvas id="minimap" width="196" height="196"></canvas>
+          <div class="minimap-compass">N</div>
+        </div>
+        <div class="minimap-caption"><span id="zone-name">中央广场</span></div>
+      </div>
+    </header>
+
+    <footer class="hud-bottom">
+      <div class="hint-bar" id="hint-bar"></div>
+    </footer>
+
+    <div class="joystick" id="joystick" aria-hidden="true">
+      <div class="joystick-ring"></div>
+      <div class="joystick-knob" id="joystick-knob"></div>
+    </div>
+
+    <div class="action-bar" id="action-bar">
+      <button class="act" data-act="jump"><b>跳</b><i>Space</i></button>
+      <button class="act" data-act="punch"><b>拳</b><i>F</i></button>
+      <button class="act" data-act="slash"><b>剑</b><i>R</i></button>
+      <button class="act" data-act="wave"><b>挥手</b><i>E</i></button>
+      <button class="act" data-act="roll"><b>翻滚</b><i>Q</i></button>
+      <button class="act" data-act="crouch"><b>蹲下</b><i>Ctrl</i></button>
+      <button class="act" data-act="weapon"><b>武器</b><i>V</i></button>
+      <button class="act" data-act="build"><b>建造</b><i>B</i></button>
+    </div>
+
+    <div class="build-panel" id="build-panel" hidden>
+      <div class="build-head">
+        <span>建造 · 选一栋房子</span>
+        <button class="build-close" id="build-close" aria-label="关闭">×</button>
+      </div>
+      <div class="build-grid" id="build-grid"></div>
+    </div>
+
+    <div class="build-bar" id="build-bar" hidden>
+      <span class="build-name" id="build-name">民房·一</span>
+      <span class="build-tip">点击地面放置 · <kbd>R</kbd> 旋转 · <kbd>Esc</kbd> 取消</span>
+      <button class="build-btn" id="build-rotate">旋转</button>
+      <button class="build-btn" id="build-cancel">取消</button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="loading" id="loading">
+      <div class="loading-inner">
+        <div class="loading-crest">
+          <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
+            <path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M8 10.5 12 8l4 2.5v5h-1.6v-4.2L12 9.7l-2.4 1.6v4.2H8v-5Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h2>苔溪镇</h2>
+        <p class="loading-sub">正在种下雨林 · <span id="loading-pct">0%</span></p>
+        <div class="progress"><i id="progress-bar"></i></div>
+        <p class="loading-tip" id="loading-tip">清晨的雾气正从溪谷里散开…</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "prompt-batch-studio",
+  "version": "1.0.0",
+  "description": "批量提示词工作台：把多个项目的需求排队投喂给 WorkBuddy 等桌面 AI 客户端",
+  "main": "main.js",
+  "author": "Prompt Batch Studio",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0"
+  }
+}

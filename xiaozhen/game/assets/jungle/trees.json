@@ -1,0 +1,52 @@
+{
+  "palm_a": {
+    "height": 10.355,
+    "width": 6.995,
+    "tris": 328
+  },
+  "palm_b": {
+    "height": 10.148,
+    "width": 6.044,
+    "tris": 347
+  },
+  "palm_queen": {
+    "height": 6.008,
+    "width": 5.805,
+    "tris": 92
+  },
+  "palm_beach": {
+    "height": 4.589,
+    "width": 5.611,
+    "tris": 144
+  },
+  "cecropia": {
+    "height": 12.027,
+    "width": 8.374,
+    "tris": 1741
+  },
+  "copal": {
+    "height": 14.546,
+    "width": 10.42,
+    "tris": 699
+  },
+  "banana": {
+    "height": 5.525,
+    "width": 4.533,
+    "tris": 137
+  },
+  "fern": {
+    "height": 1.7,
+    "width": 3.359,
+    "tris": 108
+  },
+  "bush": {
+    "height": 1.25,
+    "width": 1.349,
+    "tris": 144
+  },
+  "elephant": {
+    "height": 2.4,
+    "width": 4.24,
+    "tris": 135
+  }
+}

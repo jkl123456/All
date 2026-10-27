@@ -1,0 +1,29 @@
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# 依赖与构建产物
+node_modules/
+dist/
+.vite/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 日志与临时文件
+*.log
+.pwtest/
+.workbuddy/
+
+# 本地环境与密钥（各自项目内还有更细的规则）
+.env
+.env.*
+config.local.json
+
+# 临时文件
+$null
+*.tmp
+.tmp*/

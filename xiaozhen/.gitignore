@@ -1,0 +1,21 @@
+# 依赖
+node_modules/
+
+# 原始素材包（仓库只保留 game/assets 中转换后的运行时资源）
+Medieval Village MegaKit*/
+Medieval Village Pack*/
+Modular Character Outfits*/
+Ultimate Modular Women*/
+Ultimate Animated Animals*/
+low_barbarian_rig_051/
+*.zip
+*.blend
+Pistol Run.fbx
+
+# 调试截图与旧版本备份
+shots/
+game/backup/
+
+# 系统
+.DS_Store
+*.log

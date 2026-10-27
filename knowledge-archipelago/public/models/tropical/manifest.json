@@ -1,0 +1,603 @@
+{
+  "source": "Tropical Rain Forest Environment Pack v2.0 (3TD Studios, Ronald C. Kapaun)",
+  "unit": "metres",
+  "upAxis": "Y",
+  "textureMax": 512,
+  "assets": {
+    "beach-palm": {
+      "key": "beach-palm",
+      "file": "beach-palm.glb",
+      "targetHeight": 4.8,
+      "triangles": 384,
+      "materials": [
+        {
+          "material": "SquatPalm-material",
+          "texture": "PalmTrunkMap.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 128
+        },
+        {
+          "material": "KingsPalm01-material",
+          "texture": "KingsPalm2.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 256
+        }
+      ],
+      "bounds": {
+        "min": [
+          -2.9347,
+          0.0,
+          -3.1046
+        ],
+        "max": [
+          2.9347,
+          4.8,
+          3.1046
+        ],
+        "size": [
+          5.8694,
+          4.8,
+          6.2092
+        ]
+      },
+      "bytes": 362832
+    },
+    "palm-01": {
+      "key": "palm-01",
+      "file": "palm-01.glb",
+      "targetHeight": 7.0,
+      "triangles": 672,
+      "materials": [
+        {
+          "material": "my_Palmleaf-material",
+          "texture": "my_PalmLeaf_final.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 304
+        },
+        {
+          "material": "Dri_Palm01-material",
+          "texture": "DriPalm01.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 128
+        },
+        {
+          "material": "PalmBark2SL-material",
+          "texture": "3td_PalmBark2Seamless.jpg",
+          "alpha": false,
+          "doubleSided": true,
+          "triangles": 240
+        }
+      ],
+      "bounds": {
+        "min": [
+          -2.3642,
+          0.0,
+          -2.2525
+        ],
+        "max": [
+          2.3642,
+          7.0,
+          2.2525
+        ],
+        "size": [
+          4.7285,
+          7.0,
+          4.505
+        ]
+      },
+      "bytes": 810564
+    },
+    "queens-palm": {
+      "key": "queens-palm",
+      "file": "queens-palm.glb",
+      "targetHeight": 3.6,
+      "triangles": 248,
+      "materials": [
+        {
+          "material": "PalmMapped-material",
+          "texture": "PalmTrunkMap01.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 104
+        },
+        {
+          "material": "QueensPalm-material",
+          "texture": "QueensPalm01.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 144
+        }
+      ],
+      "bounds": {
+        "min": [
+          -1.7392,
+          0.0,
+          -1.8226
+        ],
+        "max": [
+          1.7392,
+          3.6,
+          1.8226
+        ],
+        "size": [
+          3.4784,
+          3.6,
+          3.6453
+        ]
+      },
+      "bytes": 379252
+    },
+    "banana": {
+      "key": "banana",
+      "file": "banana.glb",
+      "targetHeight": 3.0,
+      "triangles": 332,
+      "materials": [
+        {
+          "material": "bananaBark01-material",
+          "texture": "banana_bark.dds",
+          "alpha": false,
+          "doubleSided": false,
+          "triangles": 140
+        },
+        {
+          "material": "Ban_Leaf_02-material",
+          "texture": "BananaLeaf02.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 96
+        },
+        {
+          "material": "Ban_Leaf_01-material",
+          "texture": "BananaLeaf01.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 96
+        }
+      ],
+      "bounds": {
+        "min": [
+          -1.2305,
+          0.0,
+          -1.1672
+        ],
+        "max": [
+          1.2305,
+          3.0,
+          1.1672
+        ],
+        "size": [
+          2.4611,
+          3.0,
+          2.3345
+        ]
+      },
+      "bytes": 449696
+    },
+    "cecropia": {
+      "key": "cecropia",
+      "file": "cecropia.glb",
+      "targetHeight": 8.5,
+      "triangles": 1741,
+      "materials": [
+        {
+          "material": "JungleBark01-material",
+          "texture": "JungleBark02.dds",
+          "alpha": false,
+          "doubleSided": false,
+          "triangles": 409
+        },
+        {
+          "material": "BaseLeaf01-material",
+          "texture": "largeFiscus.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 1308
+        },
+        {
+          "material": "C-Vines02-material",
+          "texture": "Vines02.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 8
+        },
+        {
+          "material": "C-Vines01-material",
+          "texture": "GreenVine02.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 16
+        }
+      ],
+      "bounds": {
+        "min": [
+          -2.9592,
+          0.0,
+          -2.9268
+        ],
+        "max": [
+          2.9592,
+          8.5,
+          2.9268
+        ],
+        "size": [
+          5.9185,
+          8.5,
+          5.8537
+        ]
+      },
+      "bytes": 1005044
+    },
+    "fern": {
+      "key": "fern",
+      "file": "fern.glb",
+      "targetHeight": 1.1,
+      "triangles": 258,
+      "materials": [
+        {
+          "material": "TropicFern01-material",
+          "texture": "fern_image2.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 256
+        },
+        {
+          "material": "FernSprout01-material",
+          "texture": "ferntop.dds",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 2
+        }
+      ],
+      "bounds": {
+        "min": [
+          -0.5654,
+          0.0,
+          -0.2862
+        ],
+        "max": [
+          0.5654,
+          1.1,
+          0.2862
+        ],
+        "size": [
+          1.1309,
+          1.1,
+          0.5724
+        ]
+      },
+      "bytes": 204020
+    },
+    "elephant-ear": {
+      "key": "elephant-ear",
+      "file": "elephant-ear.glb",
+      "targetHeight": 1.8,
+      "triangles": 368,
+      "materials": [
+        {
+          "material": "ElephantBark-material",
+          "texture": "banana_bark.dds",
+          "alpha": false,
+          "doubleSided": false,
+          "triangles": 64
+        },
+        {
+          "material": "Elephant01-material",
+          "texture": "GreenLeafLong.png",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 304
+        }
+      ],
+      "bounds": {
+        "min": [
+          -1.59,
+          0.0,
+          -1.5362
+        ],
+        "max": [
+          1.59,
+          1.8,
+          1.5362
+        ],
+        "size": [
+          3.18,
+          1.8,
+          3.0724
+        ]
+      },
+      "bytes": 180420
+    },
+    "beach-grass": {
+      "key": "beach-grass",
+      "file": "beach-grass.glb",
+      "targetHeight": 0.6,
+      "triangles": 16,
+      "materials": [
+        {
+          "material": "BeachGrass01-material",
+          "texture": "3td_BeachGrass_01.png",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 16
+        }
+      ],
+      "bounds": {
+        "min": [
+          -0.3041,
+          0.0,
+          -0.3084
+        ],
+        "max": [
+          0.3041,
+          0.6,
+          0.3084
+        ],
+        "size": [
+          0.6081,
+          0.6,
+          0.6167
+        ]
+      },
+      "bytes": 147592
+    },
+    "beach-rock": {
+      "key": "beach-rock",
+      "file": "beach-rock.glb",
+      "targetHeight": 1.1,
+      "triangles": 768,
+      "materials": [
+        {
+          "material": "_td_Granite_02-material",
+          "texture": "3td_Granite_02_1024.jpg",
+          "alpha": false,
+          "doubleSided": false,
+          "triangles": 768
+        }
+      ],
+      "bounds": {
+        "min": [
+          -1.9832,
+          0.0,
+          -2.1407
+        ],
+        "max": [
+          1.9832,
+          1.1,
+          2.1407
+        ],
+        "size": [
+          3.9663,
+          1.1,
+          4.2814
+        ]
+      },
+      "bytes": 675112
+    },
+    "stone": {
+      "key": "stone",
+      "file": "stone.glb",
+      "targetHeight": 1.25,
+      "triangles": 158,
+      "materials": [
+        {
+          "material": "MossRockRed-material",
+          "texture": "MossRock01.dds",
+          "alpha": false,
+          "doubleSided": true,
+          "triangles": 158
+        }
+      ],
+      "bounds": {
+        "min": [
+          -0.7228,
+          0.0,
+          -0.7339
+        ],
+        "max": [
+          0.7228,
+          1.25,
+          0.7339
+        ],
+        "size": [
+          1.4455,
+          1.25,
+          1.4679
+        ]
+      },
+      "bytes": 715848
+    },
+    "jetty": {
+      "key": "jetty",
+      "file": "jetty.glb",
+      "targetHeight": 4.2,
+      "triangles": 492,
+      "materials": [
+        {
+          "material": "_td_TinRoof01-material",
+          "texture": "3td_TinRoof01.jpg",
+          "alpha": false,
+          "doubleSided": true,
+          "triangles": 36
+        },
+        {
+          "material": "JettyWood02-material",
+          "texture": "3td_JettyWood02.jpg",
+          "alpha": false,
+          "doubleSided": true,
+          "triangles": 192
+        },
+        {
+          "material": "JettyWood01-material",
+          "texture": "3td_JettyWood01.jpg",
+          "alpha": false,
+          "doubleSided": true,
+          "triangles": 264
+        }
+      ],
+      "bounds": {
+        "min": [
+          -3.3022,
+          0.0,
+          -1.2196
+        ],
+        "max": [
+          3.3022,
+          4.2,
+          1.2196
+        ],
+        "size": [
+          6.6045,
+          4.2,
+          2.4392
+        ]
+      },
+      "bytes": 1347836
+    },
+    "jetty-simple": {
+      "key": "jetty-simple",
+      "file": "jetty-simple.glb",
+      "targetHeight": 1.6,
+      "triangles": 420,
+      "materials": [
+        {
+          "material": "JettyWood02-material",
+          "texture": "3td_JettyWood02.jpg",
+          "alpha": false,
+          "doubleSided": false,
+          "triangles": 216
+        },
+        {
+          "material": "JettyWood01-material",
+          "texture": "3td_JettyWood01.jpg",
+          "alpha": false,
+          "doubleSided": false,
+          "triangles": 204
+        }
+      ],
+      "bounds": {
+        "min": [
+          -1.5359,
+          0.0,
+          -0.4706
+        ],
+        "max": [
+          1.5359,
+          1.6,
+          0.4706
+        ],
+        "size": [
+          3.0718,
+          1.6,
+          0.9412
+        ]
+      },
+      "bytes": 893676
+    },
+    "hut": {
+      "key": "hut",
+      "file": "hut.glb",
+      "targetHeight": 4.4,
+      "triangles": 608,
+      "materials": [
+        {
+          "material": "ThatchRoof01-material",
+          "texture": "3td_ThatchRoof_01.png",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 144
+        },
+        {
+          "material": "_TD_WoodPlank02a-material",
+          "texture": "3td_WoodPlank_02.jpg",
+          "alpha": false,
+          "doubleSided": false,
+          "triangles": 348
+        },
+        {
+          "material": "_td_WoodPlank_Trans-material",
+          "texture": "3TD_WoodPlank_T_01.png",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 84
+        },
+        {
+          "material": "_td_Canvas-material",
+          "texture": "3td_OldCanvas_01.png",
+          "alpha": true,
+          "doubleSided": true,
+          "triangles": 32
+        }
+      ],
+      "bounds": {
+        "min": [
+          -3.279,
+          0.0,
+          -2.4229
+        ],
+        "max": [
+          3.279,
+          4.4,
+          2.4229
+        ],
+        "size": [
+          6.558,
+          4.4,
+          4.8457
+        ]
+      },
+      "bytes": 1733520
+    },
+    "crate": {
+      "key": "crate",
+      "file": "crate.glb",
+      "targetHeight": 0.55,
+      "triangles": 252,
+      "materials": [
+        {
+          "material": "_td_SteelStrap-material",
+          "texture": "3td_SteelStrap01.jpg",
+          "alpha": false,
+          "doubleSided": true,
+          "triangles": 20
+        },
+        {
+          "material": "_td_Crate1_Gray-material",
+          "texture": "3td_JettyWood02.jpg",
+          "alpha": false,
+          "doubleSided": true,
+          "triangles": 140
+        },
+        {
+          "material": "_td_Rope1-material",
+          "texture": "3td_Rope_01.jpg",
+          "alpha": false,
+          "doubleSided": false,
+          "triangles": 92
+        }
+      ],
+      "bounds": {
+        "min": [
+          -0.6572,
+          0.0,
+          -0.3191
+        ],
+        "max": [
+          0.6572,
+          0.55,
+          0.3191
+        ],
+        "size": [
+          1.3145,
+          0.55,
+          0.6382
+        ]
+      },
+      "bytes": 1273976
+    }
+  }
+}

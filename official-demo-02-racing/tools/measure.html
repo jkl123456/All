@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>GLB Measure</title>
+<style>html,body{margin:0;background:#fff}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+// 固定像素/米映射：300 px = 1 m
+const PPM = 300, W = 1560, H = 960;         // 5.2m x 3.2m
+const params = new URLSearchParams(location.search);
+const file = params.get('m');
+const fit = (params.get('fit') || '').split(',').map(Number); // L,W,H
+
+const canvas = document.getElementById('c');
+canvas.width = W; canvas.height = H;
+canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+renderer.setClearColor(0xffffff, 1);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.add(new THREE.AmbientLight(0xffffff, 4));
+
+const gltf = await new GLTFLoader().loadAsync(file);
+const car = gltf.scene;
+scene.add(car);
+car.updateMatrixWorld(true);
+
+const b0 = new THREE.Box3().setFromObject(car);
+const s0 = b0.getSize(new THREE.Vector3());
+const c0 = b0.getCenter(new THREE.Vector3());
+const [L, Wd, Hh] = fit;
+car.position.set(-c0.x, -b0.min.y, -c0.z);
+car.scale.set(Wd / s0.x, Hh / s0.y, L / s0.z);
+car.updateMatrixWorld(true);
+
+// 用原贴图做平面着色（便于按亮度/饱和度识别轮胎）
+car.traverse(o => {
+  if (!o.isMesh) return;
+  const m = o.material;
+  const map = m?.map || m?.pbrMetallicRoughness?.baseColorTexture || null;
+  o.material = new THREE.MeshBasicMaterial({ map: map || null, color: map ? 0xffffff : 0x888888 });
+});
+
+renderer.setScissorTest(true);
+function view(dir, up, halfW, cx, cy) {
+  renderer.setViewport(0, cy, W, H / 2);
+  renderer.setScissor(0, cy, W, H / 2);
+  const aspect = (H / 2) / W;
+  const cam = new THREE.OrthographicCamera(-halfW, halfW, halfW * aspect, -halfW * aspect, 0.01, 400);
+  const d = new THREE.Vector3(...dir).normalize();
+  cam.position.set(cx, 0.6, 0).addScaledVector(d, 100);
+  cam.up.set(...up);
+  cam.lookAt(cx, 0.6, 0);
+  renderer.render(scene, cam);
+}
+// 上半：侧视（从 +X 看），世界 z ±2.6，y -0.2..1.4
+view([1, 0, 0], [0, 1, 0], 2.6, 0, H / 2);
+// 下半：正视（从 +Z 看），世界 x ±2.6，y -0.2..1.4
+view([0, 0, 1], [0, 1, 0], 2.6, 0, 0);
+document.title = 'ready ' + JSON.stringify({ s0: s0.toArray(), L, Wd, Hh });
+console.log('ready ' + JSON.stringify({ s0: s0.toArray() }));
+</script>
+</body>
+</html>

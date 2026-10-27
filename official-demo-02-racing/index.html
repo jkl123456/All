@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="theme-color" content="#11100e" />
+  <meta name="description" content="APEX CITY · 极速都市 — 网页 3D 城市赛车游戏。驾驶由四视图重建的 GT 赛车，在黄金时刻的海滨都市争夺冠军。" />
+  <title>APEX CITY · 极速都市 — 官方演示 02</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2311100e'/%3E%3Cpath d='M10 48 24 15h9l7 17 7-17h8L41 48h-8l-4-10-4 10z' fill='%23ff5a1f'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./styles/fonts.css" />
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="scene" aria-label="APEX CITY 3D 赛车游戏画面"></canvas>
+    <div class="fx fx-vignette"></div>
+    <div class="fx fx-grain"></div>
+    <div id="speed-fx" class="fx fx-speed">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div id="impact-fx"></div>
+
+    <!-- ============================ LOADING ============================ -->
+    <section id="screen-loading" class="screen is-active loading-screen">
+      <div class="loading-brand">
+        <span class="brand-mark">A</span>
+        <span class="loading-brand-text">APEX CITY<em>官方演示 02</em></span>
+      </div>
+      <div class="loading-center">
+        <p class="eyebrow">REAL-TIME PROCEDURAL RACING · 2026</p>
+        <h1>极速<span>都市</span></h1>
+        <p class="loading-en">A CITY BUILT FOR SPEED.</p>
+      </div>
+      <div class="loading-foot">
+        <div class="loading-meta">
+          <span id="load-step">正在构建城市</span>
+          <span id="load-pct">00</span>
+        </div>
+        <div class="loading-track"><i id="load-bar"></i></div>
+        <p class="loading-note">所有车辆、建筑、光照与声音均由程序实时生成</p>
+      </div>
+    </section>
+
+    <!-- ============================ MENU ============================ -->
+    <section id="screen-menu" class="screen menu-screen">
+      <header class="shell-top">
+        <a class="brand" href="#" data-nav="menu" aria-label="APEX CITY 首页">
+          <span class="brand-mark">A</span>
+          <span class="brand-copy">APEX CITY<small>OFFICIAL DEMO / 02</small></span>
+        </a>
+        <div class="shell-status">
+          <span class="status-dot"></span>
+          <span>黄金时刻</span>
+          <i></i>
+          <span>18:42</span>
+          <i></i>
+          <span>23°C</span>
+        </div>
+        <nav class="shell-nav">
+          <button data-nav="menu" class="nav-link is-current">赛事 <small>RACE</small></button>
+          <button data-nav="garage" class="nav-link">车库 <small>GARAGE</small></button>
+          <button data-nav="settings" class="nav-link">设置 <small>SETTINGS</small></button>
+          <button data-nav="help" class="nav-link">操控 <small>CONTROLS</small></button>
+        </nav>
+      </header>
+
+      <div class="menu-main">
+        <div class="menu-copy">
+          <p class="eyebrow reveal" id="menu-track-eyebrow">DOCKYARD LOOP · 官方演示</p>
+          <h1 class="menu-title reveal">APEX<br /><span>CITY</span></h1>
+          <div class="menu-sub reveal">
+            <span class="menu-sub-cn">极速都市</span>
+            <p id="menu-track-note">在黄金时刻的海滨大道，压住最后一个弯心。<br />四视图重建 GT 赛车，真实光影，六车同场竞速。</p>
+          </div>
+
+          <div class="mode-picker reveal" role="group" aria-label="比赛模式">
+            <button class="mode-btn is-active" data-mode="gp">
+              <span class="mode-index">01</span>
+              <span><b>城市大奖赛</b><small>GRAND PRIX · 3 LAPS</small></span>
+            </button>
+            <button class="mode-btn" data-mode="tt">
+              <span class="mode-index">02</span>
+              <span><b>计时挑战</b><small>TIME ATTACK · 3 LAPS</small></span>
+            </button>
+            <button class="mode-btn" data-mode="free">
+              <span class="mode-index">03</span>
+              <span><b>自由驾驶</b><small>FREE DRIVE · NO LIMITS</small></span>
+            </button>
+          </div>
+
+          <div class="track-picker reveal" role="group" aria-label="赛道选择">
+            <span class="track-picker-label">赛道<small>CIRCUIT · 进入地图</small></span>
+            <button class="track-btn is-active" data-track="dockyard"><b>港湾环道</b><small>1.41 KM</small></button>
+            <button class="track-btn" data-track="seabreeze"><b>海风高速</b><small>1.50 KM</small></button>
+            <button class="track-btn" data-track="midtown"><b>中环夜街</b><small>1.31 KM</small></button>
+            <button class="track-btn" data-track="forest"><b>林间山道</b><small>1.74 KM</small></button>
+          </div>
+
+          <div class="menu-actions reveal">
+            <button id="btn-start" class="btn btn-primary" data-action="start">
+              <span class="btn-label"><b>开始比赛</b><small>START ENGINE</small></span>
+              <span class="btn-arrow">→</span>
+            </button>
+            <button class="btn btn-ghost" data-nav="garage">
+              <span class="btn-label"><b>更换座驾</b><small>GARAGE</small></span>
+            </button>
+          </div>
+          <p class="menu-hint reveal"><kbd>WASD</kbd> 驾驶 <i></i> <kbd>SPACE</kbd> 漂移 <i></i> <kbd>SHIFT</kbd> 氮气 <i></i> <kbd>ESC</kbd> 暂停</p>
+          <p class="menu-hint touch-hint reveal">左下转向 · 右下油门/刹车 · 上方漂移与氮气</p>
+        </div>
+
+        <aside class="car-dossier reveal">
+          <div class="dossier-head">
+            <span>YOUR MACHINE</span>
+            <button data-nav="garage">更换 →</button>
+          </div>
+          <div class="dossier-body">
+            <div class="dossier-index" id="menu-car-index">01</div>
+            <div class="dossier-name">
+              <p id="menu-car-brand">STRADALE</p>
+              <h2 id="menu-car-name">Vireo GT3</h2>
+              <span id="menu-car-class">GT3 · RWD · 650 HP</span>
+            </div>
+          </div>
+          <div class="dossier-stats">
+            <div><span>极速</span><i><b id="stat-speed" style="width:82%"></b></i><em id="stat-speed-val">328</em></div>
+            <div><span>操控</span><i><b id="stat-grip" style="width:74%"></b></i><em id="stat-grip-val">74</em></div>
+            <div><span>加速</span><i><b id="stat-accel" style="width:80%"></b></i><em id="stat-accel-val">3.2</em></div>
+          </div>
+          <div class="dossier-colors" id="menu-colors" aria-label="车漆颜色"></div>
+        </aside>
+      </div>
+
+      <footer class="menu-foot">
+        <div class="foot-stat">
+          <span>赛道</span><b id="menu-track-name">港湾环道</b><small id="menu-track-en">DOCKYARD LOOP</small>
+        </div>
+        <div class="foot-stat">
+          <span>单圈长度</span><b id="stat-length">1.41<em>KM</em></b><small id="stat-corners">9 CORNERS</small>
+        </div>
+        <div class="foot-stat">
+          <span>最快单圈</span><b id="menu-best">--:--.---</b><small>PERSONAL BEST</small>
+        </div>
+        <div class="foot-weather">
+          <span class="sun-icon"></span>
+          <div><b>GOLDEN HOUR</b><small>干地 · 18:42</small></div>
+        </div>
+        <p class="build-tag">BUILD 1.0.0 · WEBGL</p>
+      </footer>
+    </section>
+
+    <!-- ============================ GARAGE ============================ -->
+    <section id="screen-garage" class="screen panel-screen garage-screen">
+      <header class="shell-top">
+        <a class="brand" href="#" data-nav="menu">
+          <span class="brand-mark">A</span>
+          <span class="brand-copy">APEX CITY<small>GARAGE / 车库</small></span>
+        </a>
+        <button class="back-btn" data-nav="menu">← 返回赛事</button>
+      </header>
+      <div class="panel-main garage-main">
+        <div class="panel-copy">
+          <p class="eyebrow">01 / SELECT YOUR MACHINE</p>
+          <h1 class="panel-title">传奇<br /><span>座驾</span></h1>
+          <p class="panel-desc">两台根据四视图重建的赛道机器。独立空力套件、厂队涂装与操控特性，等你逐一驾驭。</p>
+        </div>
+        <div class="garage-list" id="garage-list"></div>
+        <div class="garage-detail">
+          <div class="garage-detail-head">
+            <div><p id="garage-brand">STRADALE</p><h2 id="garage-name">Vireo GT3</h2></div>
+            <span id="garage-class">GT · RWD</span>
+          </div>
+          <p class="garage-spec" id="garage-desc"></p>
+          <div class="garage-stats" id="garage-stats"></div>
+          <div class="garage-stance" id="garage-stance">
+            <div class="garage-stance-head">
+              <span>车体比例 · <em id="stance-car">Vireo GT3</em></span>
+              <button type="button" data-stance-reset>重置 1:1</button>
+            </div>
+            <label class="stance-row"><span>高度</span><input type="range" data-stance="h" min="0.85" max="1.35" step="0.01" value="1" /><em data-stance-val="h">1.00</em></label>
+            <label class="stance-row"><span>长度</span><input type="range" data-stance="l" min="0.94" max="1.06" step="0.01" value="1" /><em data-stance-val="l">1.00</em></label>
+            <label class="stance-row"><span>宽度</span><input type="range" data-stance="w" min="0.92" max="1.08" step="0.01" value="1" /><em data-stance-val="w">1.00</em></label>
+          </div>
+          <div class="garage-paint" id="garage-paint"></div>
+          <button class="btn btn-primary" data-nav="menu"><span class="btn-label"><b>确认座驾</b><small>CONFIRM</small></span><span class="btn-arrow">→</span></button>
+        </div>
+      </div>
+      <div class="garage-hint"><span>点击车型切换</span><i></i><span>拖动鼠标旋转车身</span><i></i><span>选择会自动保存</span></div>
+    </section>
+
+    <!-- ============================ SETTINGS ============================ -->
+    <section id="screen-settings" class="screen panel-screen">
+      <header class="shell-top">
+        <a class="brand" href="#" data-nav="menu">
+          <span class="brand-mark">A</span>
+          <span class="brand-copy">APEX CITY<small>SETTINGS / 设置</small></span>
+        </a>
+        <button class="back-btn" data-nav="menu">← 返回赛事</button>
+      </header>
+      <div class="panel-main settings-main">
+        <div class="panel-copy">
+          <p class="eyebrow">02 / SYSTEM</p>
+          <h1 class="panel-title">驾驶<br /><span>设定</span></h1>
+          <p class="panel-desc">调整画面、声音与视角。更改会立即生效并自动保存。</p>
+        </div>
+        <div class="settings-groups">
+          <section class="setting-group">
+            <div class="group-head"><span>画面质量</span><small>GRAPHICS</small></div>
+            <div class="segmented" data-setting="quality">
+              <button data-value="low">流畅<small>LOW</small></button>
+              <button data-value="medium">均衡<small>MEDIUM</small></button>
+              <button data-value="high" class="is-active">电影<small>HIGH</small></button>
+            </div>
+            <p class="setting-note">电影模式启用高精度阴影、环境反射与动态泛光。</p>
+          </section>
+          <section class="setting-group">
+            <div class="group-head"><span>相机视角</span><small>CAMERA</small></div>
+            <div class="segmented" data-setting="camera">
+              <button data-value="chase" class="is-active">远追尾<small>CHASE</small></button>
+              <button data-value="near">近追尾<small>NEAR</small></button>
+              <button data-value="hood">引擎盖<small>HOOD</small></button>
+            </div>
+            <p class="setting-note">PgUp / PgDn 或手柄 LB / RB 调节镜头俯仰（每个视角独立记忆）。</p>
+          </section>
+          <section class="setting-group">
+            <div class="group-head"><span>主音量</span><small>MASTER AUDIO</small></div>
+            <div class="range-row">
+              <input type="range" id="volume" min="0" max="100" value="70" />
+              <span id="volume-val">70</span>
+            </div>
+            <div class="toggle-row">
+              <span>引擎声浪<small>ENGINE AUDIO</small></span>
+              <button class="toggle is-on" data-toggle="sound"><i></i></button>
+            </div>
+            <div class="toggle-row">
+              <span>动态模糊<small>MOTION FX</small></span>
+              <button class="toggle is-on" data-toggle="motion"><i></i></button>
+            </div>
+            <div class="toggle-row">
+              <span>性能监视<small>PERFORMANCE</small></span>
+              <button class="toggle" data-toggle="fps"><i></i></button>
+            </div>
+          </section>
+          <section class="setting-group">
+            <div class="group-head"><span>操作指南</span><small>CONTROLS</small></div>
+            <div class="key-grid">
+              <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 驾驶</span>
+              <span><kbd>SPACE</kbd> 手刹漂移</span>
+              <span><kbd>SHIFT</kbd> 氮气加速</span>
+              <span><kbd>C</kbd> 切换视角</span>
+              <span><kbd>PGUP</kbd><kbd>PGDN</kbd> 镜头俯仰</span>
+              <span><kbd>R</kbd> 回到赛道</span>
+              <span><kbd>ESC</kbd> 暂停</span>
+            </div>
+          </section>
+          <section class="setting-group">
+            <div class="group-head"><span>赛道</span><small>CIRCUIT</small></div>
+            <div class="segmented track-seg" data-setting="track">
+              <button data-track="dockyard">港湾环道<small>1.41 KM</small></button>
+              <button data-track="seabreeze">海风高速<small>1.50 KM</small></button>
+              <button data-track="midtown">中环夜街<small>1.31 KM</small></button>
+              <button data-track="forest">林间山道<small>1.74 KM</small></button>
+            </div>
+            <p class="setting-note">点击赛道进入全屏赛道地图，加载该赛道的完整地形、城市/植被与贴图。</p>
+          </section>
+          <section class="setting-group">
+            <div class="group-head"><span>手柄</span><small>GAMEPAD</small></div>
+            <div class="range-row">
+              <input type="range" id="pad-sensitivity" min="30" max="130" step="5" value="100" />
+              <span id="pad-sensitivity-val">100</span>
+            </div>
+            <p class="setting-note">转向灵敏度 · STEERING SENSITIVITY</p>
+            <div class="range-row">
+              <input type="range" id="pad-deadzone" min="2" max="35" step="1" value="12" />
+              <span id="pad-deadzone-val">12</span>
+            </div>
+            <p class="setting-note">摇杆死区 · STICK DEADZONE</p>
+            <div class="toggle-row">
+              <span>反转摇杆<small>INVERT STICK</small></span>
+              <button class="toggle" data-toggle="padInvert"><i></i></button>
+            </div>
+            <div class="toggle-row">
+              <span>手柄震动<small>RUMBLE</small></span>
+              <button class="toggle is-on" data-toggle="rumble"><i></i></button>
+            </div>
+            <p class="setting-note" id="pad-status">未检测到手柄 · 连接后自动识别</p>
+            <p class="setting-note">RT 油门 · LT 刹车 · A 氮气 · B 漂移 · Y 视角 · X 复位 · START 暂停</p>
+          </section>
+        </div>
+      </div>
+      <div class="settings-foot"><span>设置存储于本地浏览器</span><button class="text-btn" id="btn-reset-settings">恢复默认</button></div>
+    </section>
+
+    <!-- ============================ CONTROLS ============================ -->
+    <section id="screen-help" class="screen panel-screen help-screen">
+      <header class="shell-top">
+        <a class="brand" href="#" data-nav="menu">
+          <span class="brand-mark">A</span>
+          <span class="brand-copy">APEX CITY<small>CONTROLS / 操控</small></span>
+        </a>
+        <button class="back-btn" data-nav="menu">← 返回赛事</button>
+      </header>
+      <div class="panel-main help-main">
+        <div class="panel-copy">
+          <p class="eyebrow">03 / DRIVER BRIEFING</p>
+          <h1 class="panel-title">像<br /><span>车手一样</span></h1>
+          <p class="panel-desc">松开刹车，感受重量转移。入弯前刹车，弯心给油，出弯按下氮气。</p>
+          <div class="help-tip"><b>提示</b><span>漂移会为氮气充能。擦墙会损失速度与氮气。</span></div>
+        </div>
+        <div class="help-grid">
+          <article class="help-card"><span class="help-icon">W</span><div><h3>油门</h3><p>W / ↑<br />保持油门，出弯更早开油。</p></div></article>
+          <article class="help-card"><span class="help-icon">S</span><div><h3>刹车 / 倒车</h3><p>S / ↓<br />入弯前重刹，速度越低转向越灵敏。</p></div></article>
+          <article class="help-card"><span class="help-icon">A</span><div><h3>转向</h3><p>A / D / ← / →<br />轻点修正，长按进入漂移角。</p></div></article>
+          <article class="help-card accent"><span class="help-icon wide">SPACE</span><div><h3>手刹漂移</h3><p>降低后轮抓地，制造转向过度。<br />持续漂移可快速填充氮气。</p></div></article>
+          <article class="help-card accent"><span class="help-icon wide">SHIFT</span><div><h3>氮气</h3><p>瞬时获得额外推力。<br />建议在出弯、直道前使用。</p></div></article>
+          <article class="help-card"><span class="help-icon">C</span><div><h3>相机 / 重置</h3><p>C 切换追尾与引擎盖视角。<br />R 将赛车放回最近赛道。</p></div></article>
+        </div>
+        <div class="help-foot"><span>支持手柄与触屏</span><button class="btn btn-ghost" data-nav="menu"><span class="btn-label"><b>明白了</b><small>BACK TO PADDOCK</small></span></button></div>
+      </div>
+    </section>
+
+    <!-- ============================ HUD ============================ -->
+    <section id="race-hud" class="hud" aria-label="比赛 HUD">
+      <div class="hud-top-left">
+        <div class="position-block">
+          <span class="hud-label">POSITION</span>
+          <div class="position-line"><b id="hud-pos">P6</b><span id="hud-pos-total">/ 6</span></div>
+        </div>
+        <div class="lap-block">
+          <span class="hud-label">LAP</span>
+          <div class="lap-line"><b id="hud-lap">01</b><span>/ 03</span></div>
+        </div>
+        <div class="timer-block">
+          <span class="hud-label">RACE TIME</span>
+          <b id="hud-race-time" class="mono">00:00.000</b>
+        </div>
+            <div class="hud-buttons">
+              <button id="hud-camera" class="hud-btn" aria-label="切换视角">◉</button>
+              <button id="hud-pause" class="hud-btn" aria-label="暂停比赛">Ⅱ</button>
+            </div>
+            <div class="free-badge"><span>FREE DRIVE</span><b>自由驾驶</b></div>
+          </div>
+
+      <div class="hud-top-right">
+        <div class="map-panel">
+          <div class="map-head"><span id="minimap-name">DOCKYARD LOOP</span><small id="map-lap">LAP 1 / 3</small></div>
+          <canvas id="minimap" width="280" height="240"></canvas>
+        </div>
+        <div class="standings" id="standings"></div>
+      </div>
+
+      <div class="hud-center-top">
+        <div class="delta-panel" id="delta-panel">
+          <span class="hud-label">CURRENT LAP</span>
+          <b id="hud-lap-time" class="mono">00:00.000</b>
+          <div class="delta-line" id="delta-line"><span>—</span></div>
+        </div>
+      </div>
+
+      <div class="hud-bottom-left">
+        <div class="nitro-panel">
+          <div class="nitro-head"><span>NITRO</span><em id="nitro-pct">100%</em></div>
+          <div class="nitro-bar"><i id="nitro-fill"></i><span class="nitro-ticks"></span></div>
+          <p><kbd>SHIFT</kbd> 释放加速</p>
+        </div>
+        <div class="drift-panel" id="drift-panel">
+          <span>DRIFT</span><b id="drift-score">0</b>
+        </div>
+      </div>
+
+      <div class="hud-bottom-right">
+        <div class="speed-cluster">
+          <div class="rpm-lights" id="rpm-lights"></div>
+          <div class="speed-readout">
+            <span class="speed-number" id="hud-speed">0</span>
+            <div class="speed-meta"><span>KM/H</span><i></i><b id="hud-gear">N</b></div>
+          </div>
+          <div class="speed-caption"><span id="hud-throttle">THROTTLE 0%</span><span>APEX CITY</span></div>
+        </div>
+      </div>
+
+      <div class="hud-help">
+        <span><kbd>W</kbd><kbd>S</kbd> 油门·刹车</span><span><kbd>A</kbd><kbd>D</kbd> 转向</span><span><kbd>SPACE</kbd> 漂移</span><span><kbd>SHIFT</kbd> 氮气</span><span><kbd>C</kbd> 视角</span><span><kbd>ESC</kbd> 暂停</span>
+      </div>
+
+      <div class="race-toast" id="race-toast">
+        <span id="toast-kicker">LAP 2</span>
+        <b id="toast-title">01:12.408</b>
+        <small id="toast-sub">PERSONAL BEST</small>
+      </div>
+    </section>
+
+    <!-- ============================ COUNTDOWN ============================ -->
+    <div id="countdown" class="countdown">
+      <div class="countdown-lights" id="countdown-lights">
+        <i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <div class="countdown-text" id="countdown-text">READY</div>
+      <p>HOLD YOUR LINE · 准备发车</p>
+    </div>
+
+    <!-- ============================ PAUSE ============================ -->
+    <section id="screen-pause" class="screen modal-screen">
+      <div class="modal-panel pause-panel">
+        <p class="eyebrow">RACE SUSPENDED</p>
+        <h1>比赛<br /><span>暂停</span></h1>
+        <div class="pause-actions">
+          <button class="btn btn-primary" data-action="resume"><span class="btn-label"><b>继续比赛</b><small>RESUME</small></span><span class="btn-arrow">→</span></button>
+          <button class="btn btn-ghost" data-action="restart"><span class="btn-label"><b>重新发车</b><small>RESTART RACE</small></span></button>
+          <button class="btn btn-ghost" data-action="garage"><span class="btn-label"><b>更换赛车</b><small>GARAGE</small></span></button>
+          <button class="btn btn-ghost" data-action="quit"><span class="btn-label"><b>退出比赛</b><small>EXIT TO MENU</small></span></button>
+        </div>
+        <div class="pause-meta"><span id="pause-track">DOCKYARD LOOP</span><span id="pause-mode">GRAND PRIX · LAP 1/3</span><span>BUILD 1.0.0</span></div>
+      </div>
+    </section>
+
+    <!-- ============================ RESULTS ============================ -->
+    <section id="screen-results" class="screen modal-screen results-screen">
+      <div class="results-wrap">
+        <header class="results-head">
+          <p class="eyebrow">CHEQUERED FLAG</p>
+          <h1 id="results-title">比赛<span>结束</span></h1>
+          <div class="results-summary">
+            <div><span>最终排名</span><b id="result-pos">P1</b></div>
+            <div><span>总用时</span><b id="result-time" class="mono">06:22.418</b></div>
+            <div><span>最快单圈</span><b id="result-best" class="mono">01:18.204</b></div>
+          </div>
+        </header>
+        <div class="results-table-wrap">
+          <div class="results-table-head"><span>POS</span><span>DRIVER</span><span>CAR</span><span>TIME / GAP</span><span>BEST LAP</span></div>
+          <div id="results-table" class="results-table"></div>
+        </div>
+        <div class="results-actions">
+          <button class="btn btn-primary" data-action="again"><span class="btn-label"><b>再跑一场</b><small>RACE AGAIN</small></span><span class="btn-arrow">→</span></button>
+          <button class="btn btn-ghost" data-action="garage"><span class="btn-label"><b>返回车库</b><small>BACK TO PADDOCK</small></span></button>
+          <button class="btn btn-ghost" data-action="photo"><span class="btn-label"><b>拍照模式</b><small>PHOTO MODE</small></span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ FULLSCREEN MAP ============================ -->
+    <section id="map-view" class="map-view" aria-hidden="true" aria-label="赛道地图">
+      <header class="map-top">
+        <div class="map-title">
+          <p class="eyebrow">CIRCUIT MAP · 赛道地图</p>
+          <h1 id="map-name">港湾环道</h1>
+          <span id="map-en">DOCKYARD LOOP</span>
+        </div>
+        <div class="map-tools">
+          <div class="map-views" role="group" aria-label="地图视角">
+            <button type="button" data-map-view="overview" class="is-active">整体</button>
+            <button type="button" data-map-view="detail">发车区</button>
+          </div>
+          <button id="map-close" class="map-close" aria-label="返回赛事">✕</button>
+        </div>
+      </header>
+
+      <div class="map-bottom">
+        <div class="map-info">
+          <div class="map-stats">
+            <div class="map-stat"><span>单圈长度</span><b id="map-km">1.41<em>KM</em></b></div>
+            <div class="map-stat"><span>路宽</span><b id="map-width">15.5<em>M</em></b></div>
+            <div class="map-stat"><span>弯道</span><b id="map-corners">6<em>CORNERS</em></b></div>
+          </div>
+          <p class="map-note" id="map-note">紧凑慢弯 + 连续起伏</p>
+          <p class="map-hint">拖动旋转 · 滚轮 / 双指缩放 · <kbd>ESC</kbd> 返回</p>
+        </div>
+        <div class="map-actions">
+          <button id="map-back" class="btn btn-ghost"><span class="btn-label"><b>返回</b><small>BACK</small></span></button>
+          <button id="map-confirm" class="btn btn-primary">
+            <span class="btn-label"><b id="map-confirm-label">开始比赛</b><small id="map-confirm-en">START RACE</small></span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div id="perf-monitor" class="perf-monitor"><span>FPS</span><b id="fps-num">60</b><i></i><span>DRAW</span><b id="draw-num">0</b></div>
+
+    <div id="photo-hint" class="photo-hint">
+      <div><span>PHOTO MODE</span><b>照片模式</b></div>
+      <p>拖动旋转 · 滚轮缩放 · <kbd>ESC</kbd> 退出</p>
+      <button id="photo-exit">退出照片模式</button>
+    </div>
+
+    <!-- ============================ MOBILE ============================ -->
+    <div id="mobile-controls" class="mobile-controls">
+      <div class="touch-steer">
+        <button data-touch="left" aria-label="左转">◀</button>
+        <button data-touch="right" aria-label="右转">▶</button>
+      </div>
+      <div class="touch-pedals">
+        <button class="touch-small" data-touch="drift">漂移</button>
+        <button class="touch-small nitro" data-touch="nitro">氮气</button>
+        <button class="touch-brake" data-touch="brake">刹车</button>
+        <button class="touch-gas" data-touch="throttle">油门</button>
+      </div>
+    </div>
+
+    <div id="webgl-error" class="webgl-error">
+      <h2>无法启动 3D 引擎</h2>
+      <p>请使用最新版 Chrome、Edge 或 Safari，并开启硬件加速。</p>
+    </div>
+  </div>
+  <script src="./dist/game.js"></script>
+</body>
+</html>

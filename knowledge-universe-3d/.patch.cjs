@@ -1,0 +1,31 @@
+const fs = require('fs');
+const p = 'src/main.js';
+let s = fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
+const before = s.length;
+const rep = (a, b) => {
+  if (!s.includes(a)) console.log('MISS:', JSON.stringify(a.slice(0, 60)));
+  s = s.split(a).join(b);
+};
+
+rep("import { LabScene } from './lab/labScene.js';\n", '');
+rep("  labCanvas: $('lab-canvas'),\n", '');
+s = s.replace(/  lab: \$\('lab'\),[\s\S]*?  labReset: \$\('lab-reset'\),\n/, '');
+rep("  labPointId: null,\n", '');
+rep('let lab = null;\n', '');
+rep('      onPickPoint: (point) => openPointLab(point),', '      onPickPoint: (point) => openLesson(point),');
+rep("      onEmpty: () => {\n        if (state.labPointId) return;\n        if (state.selectedSubjectId) closePanel();", "      onEmpty: () => {\n        if (state.selectedSubjectId) closePanel();");
+rep('    lab = new LabScene(dom.labCanvas);\n', '');
+rep("      onOpenLab: (point) => openPointLab(point),\n", '');
+rep('window.__zhiyu = { openLesson, openChallenge, openPointLab, hud, lesson, challenge, graph, ALL_POINTS, POINT_BY_ID };', 'window.__zhiyu = { openLesson, openChallenge, hud, lesson, challenge, graph, ALL_POINTS, POINT_BY_ID };');
+rep("            <button class=\"enter-lab\" data-enter-lab=\"${point.id}\" type=\"button\">\n              <span>3D 实验室</span>\n            </button>\n", '');
+rep('  openPointLab(point);\n', '  openLesson(point);\n');
+rep('    if (state.labPointId) closeLab();\n', '');
+rep("    const enter = event.target.closest('[data-enter-lab]');\n    if (enter) {\n      openPointLab(POINT_BY_ID[enter.dataset.enterLab]);\n      return;\n    }\n", '');
+rep("    if (event.target.closest('.enter-lab')) return;\n", '');
+rep('    if (state.labPointId) return;\n    closePanel();', '    closePanel();');
+s = s.replace(/  dom\.labBack[\s\S]*?  \}\);\n\n  document\.addEventListener\('keydown', \(event\) => \{/, "  document.addEventListener('keydown', (event) => {");
+rep("      if (state.labPointId) {\n        closeLab();\n        return;\n      }\n", '');
+rep("  document.title = '知域 · 3D 知识宇宙';", "  document.title = '知域 · 知识图谱';");
+fs.writeFileSync(p, s);
+console.log('size', before, '->', s.length);
+console.log('remaining:', JSON.stringify(s.match(/lab[A-Za-z]*/gi) || []));
