@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的作品 · AI 造物馆·智纪元</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230f1222'/%3E%3Cpath d='M16 7l7 9-7 9-7-9z' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="console.css">
+</head>
+<body>
+<div class="orb orb-a" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="brand" href="index.html">
+    <span class="brand-mark">◇</span>
+    <span class="brand-text">AI 造物馆·智纪元<small>AI MAKER GALLERY</small></span>
+  </a>
+  <div class="topbar-right">
+    <a class="top-link" href="index.html">作品墙</a>
+    <span class="user-slot" id="userSlot"></span>
+  </div>
+</header>
+
+<main class="console">
+  <header class="console-head">
+    <div>
+      <p class="eyebrow">MY SPACE</p>
+      <h1>我的</h1>
+      <p class="console-sub" id="welcome">作品审核状态、收藏与评论都在这。</p>
+    </div>
+    <a class="btn primary" href="submit.html">＋ 发布作品</a>
+  </header>
+
+  <div class="tabs" id="tabs" role="tablist">
+    <button class="tab active" type="button" data-tab="projects" role="tab">我的作品</button>
+    <button class="tab" type="button" data-tab="favorites" role="tab">我的收藏</button>
+    <button class="tab" type="button" data-tab="comments" role="tab">我的评论</button>
+  </div>
+
+  <div class="panel" id="panel">
+    <p class="console-empty">加载中…</p>
+  </div>
+</main>
+
+<footer>
+  <span>AI 造物馆·智纪元 · 用 AI 做的东西值得被看见</span>
+  <span>公众号 <b>智纪元AD</b> · QQ <b>993739647</b></span>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="api.js"></script>
+<script src="my.js"></script>
+</body>
+</html>

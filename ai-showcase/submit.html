@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>上传作品 · AI 造物馆·智纪元</title>
-<meta name="description" content="上传你的 AI 作品：截图、介绍、玩法、技术栈与开源地址。">
+<title>发布作品 · AI 造物馆·智纪元</title>
+<meta name="description" content="发布你的 AI 作品：上传截图、填写介绍与技术栈，审核通过后公开展示。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230f1222'/%3E%3Cpath d='M16 7l7 9-7 9-7-9z' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="submit.css">
@@ -19,25 +19,27 @@
   </a>
   <div class="topbar-right">
     <a class="top-link" href="index.html">作品墙</a>
-    <a class="nav-cta" href="index.html">返回首页</a>
+    <span class="user-slot" id="userSlot">
+      <a class="top-link" href="auth.html">登录</a>
+    </span>
   </div>
 </header>
 
 <main class="submit-page">
   <aside class="submit-intro">
     <p class="eyebrow">SUBMIT YOUR WORK</p>
-    <h1>上传你的<br><span>AI 作品</span></h1>
-    <p>不需要源码，也不用部署 Demo。只要几张截图、一段介绍和技术栈，就能让别人看见你做了什么。</p>
+    <h1>发布你的<br><span>AI 作品</span></h1>
+    <p>提交后先进入审核队列，只有你自己能在「我的作品」里看到。管理员通过后，作品才会出现在作品墙。</p>
     <ul class="submit-tips">
-      <li><b>4 张 PC 截图</b> + 2 张手机截图最好，其他数量也可以，最多 8 张。</li>
-      <li>介绍写清背景、玩法与特别之处，300–600 字读起来最舒服。</li>
-      <li>开源地址与联系方式选填，不填也能发布。</li>
-      <li>作品保存在当前浏览器，换设备不会自动同步。</li>
+      <li><b>截图</b>：4 张 PC + 2 张手机最好，其他数量也可以，最多 8 张。</li>
+      <li><b>介绍</b>：写清背景、玩法与特别之处，读者会在详情页看到完整内容。</li>
+      <li><b>审核</b>：一般 24 小时内处理；被驳回会给出原因，修改后可重新提交。</li>
+      <li><b>开源地址</b>与联系方式选填，不填也能发布。</li>
     </ul>
     <div class="wechat-mini">
       <span class="wechat-label">微信公众号</span>
       <strong>智纪元AD</strong>
-      <span class="wechat-hint">想被收录到正式作品墙，可在公众号后台留言</span>
+      <span class="wechat-hint">关注获取审核进度与作品更新</span>
     </div>
   </aside>
 
@@ -58,7 +60,7 @@
     </div>
 
     <div class="field">
-      <label for="fDesc">介绍 <i>*</i> <span>建议 300–600 字，写清背景、机制与特别之处</span></label>
+      <label for="fDesc">介绍 <i>*</i></label>
       <textarea id="fDesc" name="description" rows="6" required placeholder="它解决什么问题、怎么玩、有什么特别的地方"></textarea>
     </div>
     <div class="field">
@@ -96,7 +98,7 @@
 
     <div class="submit-actions">
       <a class="btn ghost" href="index.html">取消</a>
-      <button class="btn primary" type="submit">发布作品</button>
+      <button class="btn primary" type="submit" id="submitBtn">提交审核</button>
     </div>
   </form>
 </main>
@@ -109,6 +111,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script src="data/projects.js"></script>
+<script src="api.js"></script>
 <script src="submit.js"></script>
 </body>
 </html>

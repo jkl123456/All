@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>作品详情 · AI 造物馆·智纪元</title>
-<meta name="description" content="AI 造物馆·智纪元 作品详情：PC 与手机截图、介绍、玩法、技术栈与开源地址。">
+<meta name="description" content="AI 造物馆·智纪元 作品详情：PC 与手机截图、介绍、玩法、点赞收藏与评论。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230f1222'/%3E%3Cpath d='M16 7l7 9-7 9-7-9z' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="detail.css">
@@ -18,13 +18,18 @@
     <span class="brand-text">AI 造物馆·智纪元<small>AI MAKER GALLERY</small></span>
   </a>
   <div class="topbar-right">
-    <a class="top-link" href="#about">公众号</a>
-    <a class="nav-cta" href="index.html">全部作品</a>
+    <a class="top-link" href="index.html">作品墙</a>
+    <span class="user-slot" id="userSlot">
+      <a class="top-link" href="auth.html">登录</a>
+      <a class="nav-cta" href="submit.html">发布作品</a>
+    </span>
   </div>
 </header>
 
 <main class="detail-wrap" id="detailRoot">
   <a class="back" href="index.html">← 返回作品墙</a>
+
+  <div class="status-banner hidden" id="statusBanner"></div>
 
   <section class="project-head">
     <div class="cats" id="dCats"></div>
@@ -64,7 +69,7 @@
       <div class="contact-box" id="dContact"></div>
 
       <h3>关注公众号</h3>
-      <div class="wechat-mini" id="about">
+      <div class="wechat-mini">
         <span class="wechat-label">微信公众号</span>
         <strong>智纪元AD</strong>
         <span class="wechat-hint">微信搜索「智纪元AD」关注</span>
@@ -75,8 +80,29 @@
     </aside>
   </section>
 
+  <section class="comments" id="comments">
+    <div class="comments-head">
+      <h2>评论 <span id="commentCount">0</span></h2>
+      <span class="comments-hint">登录后可以留言</span>
+    </div>
+    <div class="comment-editor" id="commentEditor"></div>
+    <div class="comment-list" id="commentList"></div>
+  </section>
+
   <nav class="pager" id="dPager"></nav>
 </main>
+
+<div class="action-bar" id="actionBar">
+  <button type="button" data-action="like" aria-pressed="false">
+    <span class="ico">♡</span><span class="label">点赞</span><em id="likeCount">0</em>
+  </button>
+  <button type="button" data-action="favorite" aria-pressed="false">
+    <span class="ico">☆</span><span class="label">收藏</span><em id="favCount">0</em>
+  </button>
+  <button type="button" data-action="comment">
+    <span class="ico">💬</span><span class="label">评论</span><em id="commentCountBar">0</em>
+  </button>
+</div>
 
 <footer>
   <span>AI 造物馆·智纪元 · 用 AI 做的东西值得被看见</span>
@@ -91,6 +117,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script src="data/projects.js"></script>
+<script src="api.js"></script>
 <script src="detail.js"></script>
 </body>
 </html>

@@ -1,96 +1,129 @@
 # AI 造物馆·智纪元
 
-智纪元AD 的 AI 作品展馆：收集用 AI 开发的小软件、游戏与工具。不上传源码、不跑在线 Demo，只保留 4 张 PC 截图、2 张手机截图、一段介绍、玩法、技术栈，以及作者留下的开源地址和联系方式。
+智纪元AD 的 AI 作品展示站，带账号、邮箱验证码注册、作品审核、点赞收藏评论与管理后台。
 
-![首页](assets/projects/universe/pc-2.jpg)
+- 访客：浏览已审核通过的作品、按分类筛选/搜索、查看详情（4 张 PC + 2 张手机截图）、点赞、收藏、评论。
+- 创作者：注册登录后发布作品，作品先进入待审核队列，只有自己能在「我的作品」看到；审核通过后才出现在作品墙。
+- 管理员：审核通过/驳回、助推排序、删除作品、搜索用户、拉黑、禁言、查看用户作品与评论。
 
-## 功能
+## 技术栈
 
-- **作品墙**：PC 一排 4 个、手机一排 2 个；14 个细分分类（3D 游戏、知识教育、图形渲染、Web 应用、数据可视化、开发工具、桌面应用、自动化、AI 应用、效率工具、内容创作、音视频、实验项目、本地工具），支持分类筛选与全文搜索。
-- **分页**：每页 8 件，底部页码自动出现；筛选或搜索时回到第 1 页。
-- **独立详情页**：`detail.html?id=xxx`，4 张 PC 大图两列平铺、2 张手机图并排，点击任意图片全屏放大。
-- **折叠阅读**：介绍与玩法默认只展示 6 行，超出部分用渐变遮罩收起，点「展开全文 / 展开全部」阅读完整内容。
-- **发布日期**：作品墙卡片与详情页都会显示作品的发布时间。
-- **上传页**：`submit.html` 独立页面，手机首页右下角有加号悬浮按钮直达；最多 8 张截图，拖拽或点选，自动压缩到 1600px，每张图可切换「PC 端 / 手机端」标注。
-- **公众号**：关注「智纪元AD」，收录、合作与反馈都走公众号；技术问题可联系 QQ 993739647。
-- **本地持久化**：提交的作品存在浏览器 IndexedDB 里，刷新不丢；预置作品来自 `data/projects.js`。
+- 前端：原生 HTML / CSS / JavaScript，无框架、无构建步骤
+- 后端：Node.js + Express + better-sqlite3 + JWT（httpOnly cookie）+ multer + nodemailer
+- 数据：SQLite（`server/data/app.db`），图片存 `server/data/uploads/`
 
-## 运行
-
-纯静态，零依赖。可以直接双击 `index.html`，也可以起一个静态服务：
+## 快速开始
 
 ```bash
-python -m http.server 8899
-# 打开 http://127.0.0.1:8899
+cd ai-showcase
+npm install
+cp .env.example .env      # Windows: copy .env.example .env
+npm run seed              # 初始化 6 件预置作品 + 管理员
+npm start                 # http://127.0.0.1:3000
 ```
 
-## 部署到 GitHub Pages
+`npm run seed` 默认创建：
 
-仓库自带 `.github/workflows/deploy-showcase.yml`，会把 `ai-showcase/` 单独发布：
+- 管理员 `admin@zhijiyuan.local / admin123456`
+- 系统作者 `showcase@zhijiyuan.local`（6 件预置作品的作者）
 
-1. 打开仓库 **Settings → Pages**，把 Source 切到 **GitHub Actions**；
-2. 推送到 `main`（或手动运行 workflow），站点会发布在 `https://<用户名>.github.io/All/`。
+正式使用前请修改 `.env` 里的 `ADMIN_EMAIL` 与 `ADMIN_PASSWORD`，并重新运行 `npm run seed`。
 
-也可以把 `ai-showcase/` 单独建一个仓库，根目录直接发布，不需要构建。
+## 邮箱验证码
 
-## 收录作品
+在 `.env` 里配置 SMTP（QQ 邮箱填授权码，不是登录密码）：
 
-访客在 `submit.html` 提交的作品只存在他自己的浏览器里。想收录到正式作品墙：
-
-1. 关注公众号「智纪元AD」，在后台留言说明作品名称；
-2. 或把你的作品信息按 `data/projects.js` 的格式整理成 PR；
-3. 图片建议存成文件放到 `assets/projects/<slug>/`，再把 `src` 改成相对路径。
-
-## 数据结构
-
-```js
-{
-  id: 'zhiyu',
-  name: '知屿 · 知识群岛',
-  tagline: '一句话简介',
-  categories: ['3D 游戏', '知识教育', '图形渲染', 'Web 应用'], // 可多选，最多 3 个
-  platforms: ['Web', '移动端'],
-  description: '600–800 字介绍，用 \\n\\n 分段……',
-  gameplay: ['玩法一', '玩法二'],
-  stack: ['three.js', 'Vite'],
-  repo: 'https://github.com/...',   // 选填
-  contactName: '昵称',              // 选填
-  contact: '邮箱 / 主页 / 微信',     // 选填
-  qq: '993739647',
-  date: '2026-10-25',
-  cover: 'assets/projects/zhiyu/pc-2.jpg',
-  images: [
-    { src: 'assets/projects/zhiyu/pc-1.jpg', label: 'pc' },
-    { src: 'assets/projects/zhiyu/pc-2.jpg', label: 'pc' },
-    { src: 'assets/projects/zhiyu/pc-3.jpg', label: 'pc' },
-    { src: 'assets/projects/zhiyu/pc-4.jpg', label: 'pc' },
-    { src: 'assets/projects/zhiyu/mobile-1.jpg', label: 'mobile' },
-    { src: 'assets/projects/zhiyu/mobile-2.jpg', label: 'mobile' }
-  ]
-}
 ```
+SMTP_HOST=smtp.qq.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=you@qq.com
+SMTP_PASS=你的SMTP授权码
+SMTP_FROM=you@qq.com
+```
+
+未配置 SMTP 时，验证码会打印到服务端控制台，并在注册页的提示里显示（仅开发模式），方便本地跑通流程。
+
+## 审核与助推规则
+
+- 新发布的作品状态为 `pending`：作者本人与管理员可见，游客访问详情返回 404。
+- 管理员在 `/admin.html` 通过后状态变为 `approved`，进入作品墙；驳回可填写原因，作者在「我的作品」能看到。
+- **助推**：被助推的作品按时间倒序排在**第 1 页**；未助推的作品从第 2 页开始按时间倒序展示。第 1 页会提示「查看全部作品」直接跳到第 2 页。
+- 作者编辑已通过的作品后，状态会回到 `pending` 重新审核。
+
+## 用户管理
+
+后台「用户」页支持：
+
+- 搜索邮箱 / 昵称 / ID
+- 查看基本信息：注册时间、作品数、评论数、点赞数、最近作品与评论
+- 拉黑：账号无法登录、无法发布与互动
+- 禁言：可设置分钟数（60 = 1 小时，1440 = 1 天），禁言期间不能评论，其余功能正常
 
 ## 目录
 
 ```
-index.html            首页：搜索、14 个分类、四列作品墙、分页、公众号
-submit.html           上传页：表单与图片上传
-detail.html           作品详情：4 PC + 2 手机截图、折叠介绍、发布日期
-styles.css            首页与共用组件
-submit.css            上传页布局
-detail.css            详情页与图片灯箱
-app.js                首页：筛选、搜索、分页、IndexedDB 读取
-submit.js             上传页：表单校验、图片压缩、IndexedDB 保存
-detail.js             详情页渲染、折叠、灯箱
-data/projects.js      分类、站点信息与 6 件预置作品
-assets/projects/      各作品截图（每件 4 PC + 2 手机）
+index.html / app.js          首页：分类、搜索、分页、精选标识
+detail.html / detail.js      详情：截图平铺、折叠介绍、点赞收藏评论
+submit.html / submit.js      发布：登录校验、图片压缩上传、提交审核
+my.html / my.js              我的：作品状态、收藏、评论
+admin.html / admin.js        后台：概览、审核、助推、用户管理
+auth.html / auth.js          登录 / 邮箱验证码注册
+api.js                       统一 API 封装与顶栏登录态
+styles.css / detail.css / submit.css / console.css / auth.css
+data/projects.js             14 个分类、站点信息、6 件预置作品（seed 用）
+assets/projects/             预置作品截图
+server/
+  index.js                   Express 入口、静态托管
+  db.js                      SQLite 初始化与查询
+  auth.js                    验证码、注册、登录、中间件
+  projects.js                作品 CRUD、点赞收藏、评论、图片上传
+  admin.js                   审核、助推、用户管理
+  my.js                      我的作品 / 收藏 / 评论
+  mailer.js                  SMTP 发信（未配置时打印验证码）
+  seed.js                    初始化预置数据与管理员
+  data/                      SQLite 与上传图片（已 gitignore）
 ```
 
-## 说明
+## API 速览
 
-- 截图会自动压缩为 JPEG（最长边 1600px），避免 IndexedDB 撑爆。
-- 如果浏览器禁用了 IndexedDB，提交会失败并给出提示；换 Chrome / Edge 或部署到 HTTPS 即可。
-- 网站不收集任何访客数据，没有后端与统计脚本。
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| POST | `/api/auth/send-code` | 发送注册验证码 |
+| POST | `/api/auth/register` | 注册并登录 |
+| POST | `/api/auth/login` | 登录 |
+| GET | `/api/projects?page=&category=&q=` | 已审核作品（助推在前） |
+| GET | `/api/projects/:id` | 详情（未审核仅作者/管理员） |
+| POST | `/api/projects` | 发布作品（pending） |
+| POST | `/api/projects/:id/like` | 点赞 / 取消 |
+| POST | `/api/projects/:id/favorite` | 收藏 / 取消 |
+| GET/POST | `/api/projects/:id/comments` | 评论列表 / 发表 |
+| POST | `/api/projects/upload/images` | 上传截图（最多 8 张） |
+| GET | `/api/my/projects` | 我的作品（含审核状态） |
+| GET | `/api/admin/stats` | 后台统计 |
+| GET | `/api/admin/projects?status=` | 后台作品列表 |
+| POST | `/api/admin/projects/:id/review` | 通过 / 驳回 |
+| POST | `/api/admin/projects/:id/boost` | 助推 / 取消助推 |
+| GET | `/api/admin/users` | 用户列表 |
+| POST | `/api/admin/users/:id/ban` | 拉黑 / 解除 |
+| POST | `/api/admin/users/:id/mute` | 禁言 / 解除 |
+
+## 部署
+
+这是带 Node 服务的应用，**不能直接放 GitHub Pages**（静态页面能打开，但登录、发布、评论都需要后端）。部署到任意支持 Node 18+ 的服务器：
+
+```bash
+npm install --omit=dev
+NODE_ENV=production PORT=3000 node server/index.js
+```
+
+建议前面加 Nginx 反代并启用 HTTPS，同时：
+
+- 设置强随机 `JWT_SECRET`
+- 配置 SMTP
+- 备份 `server/data/`（数据库与上传图片）
+
+GitHub 仓库里只保留源码与预置截图，`server/data/`、`.env`、`node_modules/` 都已排除。
 
 ## 许可
 
