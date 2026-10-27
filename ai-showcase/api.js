@@ -95,6 +95,7 @@
     },
     review: (id, action, reason) => post(`/api/admin/projects/${id}/review`, { action, reason }),
     boost: (id, boost) => post(`/api/admin/projects/${id}/boost`, { boost }),
+    demote: (id, demote) => post(`/api/admin/projects/${id}/demote`, { demote }),
     adminDeleteProject: (id) => del(`/api/admin/projects/${id}`),
     adminUsers: (params = {}) => {
       const qs = new URLSearchParams();

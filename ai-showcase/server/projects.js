@@ -64,38 +64,60 @@ function matches(row, category, q) {
   return haystack.includes(q.toLowerCase());
 }
 
-/* ---------------- 公开列表 ---------------- */
+/* ---------------- 公开列表 ----------------
+ * 排序规则：
+ * 1. 第 1 页：推荐作品优先（按时间，最多 8 个），不足用普通作品按时间补满；
+ *    推荐只在第 1 页享受一次机会，被挤出首页后与普通作品一样按时间排。
+ * 2. 第 2 页：剩余的非降级作品，按时间倒序。
+ * 3. 第 3 页起：剩余作品（含降级）统一按时间倒序，不再区分优先级。
+ * 4. 降级作品不出现在前两页。
+ */
 router.get('/', (req, res) => {
   const page = Math.max(1, Number(req.query.page) || 1);
   const category = String(req.query.category || '').trim();
   const q = String(req.query.q || '').trim();
 
   const all = loadAllApproved().filter((row) => matches(row, category, q));
-  const boosted = all.filter((row) => row.boost);
-  const normal = all.filter((row) => !row.boost);
+  const normal = all.filter((row) => !row.demote);
+  const demoted = all.filter((row) => row.demote);
 
-  const boostedPages = Math.ceil(boosted.length / PAGE_SIZE);
-  const normalPages = Math.ceil(normal.length / PAGE_SIZE);
-  const totalPages = Math.max(1, boostedPages + normalPages);
-
-  let rows = [];
-  let section = 'all';
-  if (page <= boostedPages) {
-    rows = boosted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-    section = 'boost';
-  } else {
-    const normalPage = page - boostedPages;
-    rows = normal.slice((normalPage - 1) * PAGE_SIZE, normalPage * PAGE_SIZE);
+  // 第 1 页：推荐优先 + 普通补足
+  const first = [];
+  for (const row of normal) {
+    if (row.boost && first.length < PAGE_SIZE) first.push(row);
   }
+  for (const row of normal) {
+    if (first.length >= PAGE_SIZE) break;
+    if (!row.boost) first.push(row);
+  }
+  const firstIds = new Set(first.map((row) => row.id));
+
+  // 第 2 页：剩余非降级
+  const second = normal.filter((row) => !firstIds.has(row.id)).slice(0, PAGE_SIZE);
+  const secondIds = new Set(second.map((row) => row.id));
+
+  // 第 3 页起：剩余非降级 + 降级，统一按时间
+  const rest = [...normal.filter((row) => !firstIds.has(row.id) && !secondIds.has(row.id)), ...demoted].sort(
+    (a, b) => b.created_at - a.created_at
+  );
+
+  const pages = [first];
+  if (second.length) pages.push(second);
+  for (let i = 0; i < rest.length; i += PAGE_SIZE) {
+    pages.push(rest.slice(i, i + PAGE_SIZE));
+  }
+
+  const totalPages = Math.max(1, pages.length);
+  const rows = pages[page - 1] || [];
 
   res.json({
     items: rows.map((row) => mapProject(row, req.user?.id || 0)),
     page,
     totalPages,
     total: all.length,
-    boostedCount: boosted.length,
     pageSize: PAGE_SIZE,
-    section
+    promoted: normal.filter((row) => row.boost).length,
+    demoted: demoted.length
   });
 });
 

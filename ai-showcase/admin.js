@@ -44,7 +44,7 @@
           <dl class="stat-card"><dt>收藏</dt><dd>${s.favorites}</dd></dl>
           <dl class="stat-card"><dt>已驳回</dt><dd>${s.rejected}</dd></dl>
         </div>
-        <p class="console-sub">助推规则：被助推的作品从第 1 页开始按时间排序；未助推作品从后面的页码开始显示。</p>`;
+        <p class="console-sub">排序规则：推荐作品只占第 1 页（最多 8 个，不足用普通作品补满）；被挤出首页后与普通作品一样按时间排序；降低优先级的作品不出现在前两页，从第 3 页开始参与时间排序。</p>`;
     } catch (error) {
       panel.innerHTML = `<p class="console-empty">${escapeHtml(error.message)}</p>`;
     }
@@ -59,7 +59,8 @@
         : project.status === 'rejected'
           ? '<span class="badge bad">已驳回</span>'
           : '<span class="badge wait">待审核</span>';
-    const boost = project.boost ? '<span class="badge boost">精选</span>' : '';
+    const boost = project.boost ? '<span class="badge boost">推荐首页</span>' : '';
+    const demote = project.demote ? '<span class="badge bad">已降级</span>' : '';
     return `
       <article class="row" data-id="${escapeHtml(project.id)}">
         <a class="row-cover" href="detail.html?id=${encodeURIComponent(project.id)}">
@@ -68,7 +69,7 @@
         <div class="row-main">
           <div class="row-title">
             <a href="detail.html?id=${encodeURIComponent(project.id)}">${escapeHtml(project.name)}</a>
-            ${status}${boost}
+            ${status}${boost}${demote}
           </div>
           <p class="row-desc">${escapeHtml(project.tagline || '')}</p>
           <div class="row-meta">
@@ -82,7 +83,8 @@
           ${mode === 'pending'
             ? `<button class="btn primary" type="button" data-approve="${escapeHtml(project.id)}">通过</button>
                <button class="btn danger" type="button" data-reject="${escapeHtml(project.id)}">驳回</button>`
-            : `<button class="btn ghost" type="button" data-boost="${escapeHtml(project.id)}" data-on="${project.boost ? '1' : '0'}">${project.boost ? '取消助推' : '助推'}</button>
+            : `<button class="btn ghost" type="button" data-boost="${escapeHtml(project.id)}" data-on="${project.boost ? '1' : '0'}">${project.boost ? '取消推荐' : '推荐首页'}</button>
+               <button class="btn ghost" type="button" data-demote="${escapeHtml(project.id)}" data-on="${project.demote ? '1' : '0'}">${project.demote ? '取消降级' : '降低优先级'}</button>
                <a class="btn ghost" href="detail.html?id=${encodeURIComponent(project.id)}">查看</a>
                <button class="btn danger" type="button" data-del="${escapeHtml(project.id)}">删除</button>`}
         </div>
@@ -188,7 +190,7 @@
 
     $('#panel').addEventListener('click', async (event) => {
       const target = event.target;
-      const id = target.dataset.approve || target.dataset.reject || target.dataset.boost || target.dataset.del;
+      const id = target.dataset.approve || target.dataset.reject || target.dataset.boost || target.dataset.demote || target.dataset.del;
       try {
         if (target.dataset.approve) {
           await API.review(target.dataset.approve, 'approve');
@@ -203,7 +205,12 @@
         } else if (target.dataset.boost) {
           const on = target.dataset.on === '1';
           await API.boost(target.dataset.boost, !on);
-          toast(on ? '已取消助推' : '已助推到第 1 页');
+          toast(on ? '已取消推荐' : '已设为首页推荐');
+          renderProjects('projects');
+        } else if (target.dataset.demote) {
+          const on = target.dataset.on === '1';
+          await API.demote(target.dataset.demote, !on);
+          toast(on ? '已取消降级' : '已降低优先级，作品排到第 3 页之后');
           renderProjects('projects');
         } else if (target.dataset.del) {
           if (!confirm('删除这件作品？无法恢复。')) return;

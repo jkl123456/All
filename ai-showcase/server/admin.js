@@ -15,6 +15,7 @@ router.get('/stats', (_req, res) => {
     approved: count("SELECT COUNT(*) AS n FROM projects WHERE status = 'approved'"),
     rejected: count("SELECT COUNT(*) AS n FROM projects WHERE status = 'rejected'"),
     boosted: count('SELECT COUNT(*) AS n FROM projects WHERE boost = 1 AND status = \'approved\''),
+    demoted: count('SELECT COUNT(*) AS n FROM projects WHERE demote = 1 AND status = \'approved\''),
     comments: count('SELECT COUNT(*) AS n FROM comments WHERE deleted = 0'),
     likes: count('SELECT COUNT(*) AS n FROM likes'),
     favorites: count('SELECT COUNT(*) AS n FROM favorites')
@@ -82,6 +83,14 @@ router.post('/projects/:id/boost', (req, res) => {
   }
   db.prepare('UPDATE projects SET boost = ? WHERE id = ?').run(boost, row.id);
   res.json({ ok: true, boost: Boolean(boost) });
+});
+
+router.post('/projects/:id/demote', (req, res) => {
+  const demote = req.body?.demote ? 1 : 0;
+  const row = db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: '作品不存在' });
+  db.prepare('UPDATE projects SET demote = ? WHERE id = ?').run(demote, row.id);
+  res.json({ ok: true, demote: Boolean(demote) });
 });
 
 router.delete('/projects/:id', (req, res) => {

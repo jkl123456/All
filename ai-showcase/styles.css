@@ -331,9 +331,6 @@ main { overflow: clip; }
 /* ---------------- 关于 / 页脚 ---------------- */
 .about { max-width: 1320px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 40px) 70px; }
 .about-card {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 36px;
   padding: clamp(24px, 3.5vw, 38px);
   background: linear-gradient(135deg, #101223 0%, #1d2140 60%, #23304d 100%);
   color: #e8eaf6;
@@ -550,7 +547,6 @@ footer b { color: var(--ink); }
 /* ---------------- 响应式 ---------------- */
 @media (max-width: 1180px) {
   .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .about-card { grid-template-columns: 1fr; gap: 24px; }
 }
 
 @media (max-width: 820px) {
@@ -672,23 +668,33 @@ footer b { color: var(--ink); }
 .wechat-mini strong { font-size: 18px; color: #fff; letter-spacing: -0.01em; line-height: 1.3; }
 .wechat-mini .wechat-hint { font-size: 11.5px; color: #a9b0cc; line-height: 1.6; }
 
+.wechat-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 9px 16px 9px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 12.5px;
+  color: #c7cce6;
+}
+.wechat-line b { color: #7dd3a8; }
+.wechat-icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
 /* ---------------- 登录态 / 提示 ---------------- */
 .user-slot { display: flex; align-items: center; gap: 10px; }
-
-.card-boost {
-  position: absolute;
-  left: 9px;
-  bottom: 9px;
-  z-index: 1;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #f59e0b, #f97316);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  box-shadow: 0 4px 12px -4px rgba(249, 115, 22, 0.8);
-}
 
 .offline-banner {
   max-width: 1320px;
@@ -708,9 +714,3 @@ footer b { color: var(--ink); }
   font-size: 11.5px;
 }
 
-.section-note {
-  margin: -4px 0 16px;
-  font-size: 12px;
-  color: var(--soft);
-}
-.section-note.empty { display: none; }

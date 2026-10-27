@@ -13,8 +13,7 @@
     items: [],
     total: 0,
     totalPages: 1,
-    online: true,
-    section: 'all'
+    online: true
   };
 
   const $ = (sel) => document.querySelector(sel);
@@ -79,7 +78,6 @@
         <div class="card-cover">
           ${cover ? `<img src="${cover}" alt="${escapeHtml(project.name)} 截图" loading="lazy">` : ''}
           <span class="card-badge">${escapeHtml(cat)}</span>
-          ${project.boost ? '<span class="card-boost">精选</span>' : ''}
           <span class="card-shots">${shots.length} 图</span>
         </div>
         <div class="card-body">
@@ -114,22 +112,6 @@
     nav.innerHTML = buttons.join('');
   }
 
-  function renderSectionNote() {
-    const note = $('#sectionNote');
-    if (state.online && state.section === 'boost' && state.page === 1) {
-      note.classList.remove('hidden');
-      note.innerHTML = `本页为管理员助推的精选作品，未助推作品从后面的页码按时间排序。${
-        state.totalPages > 1 ? '<button class="link-btn" type="button" id="seeAllBtn">查看全部作品 →</button>' : ''
-      }`;
-      $('#seeAllBtn')?.addEventListener('click', () => goPage(2));
-    } else if (state.online && state.section === 'all' && state.page === 1) {
-      note.classList.remove('hidden');
-      note.textContent = '按发布时间从新到旧排列。';
-    } else {
-      note.classList.add('hidden');
-    }
-  }
-
   async function loadPage() {
     try {
       const data = await API.listProjects({
@@ -141,7 +123,6 @@
       state.items = data.items;
       state.total = data.total;
       state.totalPages = data.totalPages;
-      state.section = data.section;
       $('#offlineBanner').classList.add('hidden');
     } catch {
       state.online = false;
@@ -150,7 +131,6 @@
       state.totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
       if (state.page > state.totalPages) state.page = state.totalPages;
       state.items = list.slice((state.page - 1) * PAGE_SIZE, state.page * PAGE_SIZE);
-      state.section = 'all';
       $('#offlineBanner').classList.remove('hidden');
     }
 
@@ -160,7 +140,6 @@
       ? `找到 ${state.total} 件作品`
       : `共 ${state.total} 件作品`;
     renderPagination();
-    renderSectionNote();
   }
 
   function goPage(page) {

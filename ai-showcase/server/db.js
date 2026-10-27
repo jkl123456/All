@@ -115,6 +115,12 @@ CREATE TABLE IF NOT EXISTS comments (
 CREATE INDEX IF NOT EXISTS idx_comments_project ON comments(project_id, created_at DESC);
 `);
 
+/* 老库迁移：补上降低优先级字段 */
+const projectColumns = db.prepare('PRAGMA table_info(projects)').all();
+if (!projectColumns.some((column) => column.name === 'demote')) {
+  db.exec('ALTER TABLE projects ADD COLUMN demote INTEGER NOT NULL DEFAULT 0');
+}
+
 export function parseJson(text, fallback) {
   try {
     const value = JSON.parse(text);
@@ -172,6 +178,7 @@ export function mapProject(row, viewerId = 0) {
     status: row.status,
     rejectReason: row.reject_reason,
     boost: Boolean(row.boost),
+    demote: Boolean(row.demote),
     createdAt: row.created_at,
     reviewedAt: row.reviewed_at,
     date: new Date(row.created_at).toISOString().slice(0, 10),
