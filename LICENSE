@@ -1,21 +1,49 @@
-MIT License
+非商业学习许可协议
+Non-Commercial Learning License
 
-Copyright (c) 2026 jkl123456
+版权所有 (c) 2026 jkl123456
+联系方式：QQ 993739647
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+---
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+一、许可范围
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+1. 允许个人下载、阅读、学习、研究本项目（含代码、文档、截图）的完整内容。
+2. 允许为学习目的修改代码，并在个人、非公开的环境中运行。
+3. 允许在非商业的教学、博客、技术分享或视频中引用少量代码片段或截图，但必须注明出处并保留本许可声明。
+
+二、禁止事项
+
+1. 不得将本项目全部或部分用于任何商业用途，包括但不限于：商业产品、付费服务、SaaS 平台、企业内部商业项目、外包交付、二次销售、付费课程与付费社群。
+2. 不得直接售卖本项目的代码、截图、文档，或将其打包进任何商业产品或素材库。
+3. 不得移除、隐藏或修改本项目中的版权声明、作者标识与许可声明。
+4. 不得将本项目用于任何违法或侵害他人权益的用途。
+
+三、商业授权
+
+如需将本项目用于商业目的，必须事先取得作者的书面授权。
+
+商业授权请联系：QQ 993739647（备注：商业授权）
+
+四、第三方素材
+
+项目中引用的第三方美术素材、模型、字体与开源库，遵循其各自的原始许可（见各项目 README 与素材包内附带的许可文件）。使用前请自行确认并遵守对应许可。
+
+五、免责声明
+
+本项目按「现状」提供，不附带任何明示或暗示的担保。作者不对使用本项目造成的任何直接或间接损失承担责任。
+
+---
+
+Non-Commercial Learning License
+
+Copyright (c) 2026 jkl123456. All rights reserved.
+
+1. You may read, study, research, and modify this project for personal, non-commercial learning purposes only.
+2. You may quote small code snippets or screenshots in non-commercial teaching, blogs, or technical sharing, provided the source is credited and this notice is retained.
+3. You may NOT use this project, in whole or in part, for any commercial purpose — including commercial products, paid services, SaaS platforms, internal business projects, outsourcing, resale, paid courses, or paid communities.
+4. You may NOT sell the code, screenshots, or documentation, remove any copyright notice, or use this project for unlawful purposes.
+5. For commercial licensing, contact the author: QQ 993739647.
+
+Third-party assets (art, models, fonts, libraries) remain under their original licenses.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
