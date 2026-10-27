@@ -27,3 +27,6 @@ config.local.json
 $null
 *.tmp
 .tmp*/
+
+# 本地展示站，不参与开源仓库
+ai-showcase/

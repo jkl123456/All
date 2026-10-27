@@ -1,6 +1,6 @@
 # AI 造物实验室
 
-> 六个用 AI 一起做出来的小项目，外加一个只放作品的展馆。
+> 六个用 AI 一起做出来的小项目。
 
 **使用许可：仅限个人学习、研究与技术交流，禁止任何商业用途。商业授权请联系作者 QQ 993739647。** 详见 [LICENSE](LICENSE)。
 
@@ -16,7 +16,6 @@
 | [批量提示词工作台](prompt-batch-studio/) | <img src="prompt-batch-studio/screenshots/pc-1.jpg" width="220"> | Windows 桌面工具：把「写需求 → 粘贴 → 等 AI 写完」整条队列自动化。 | Electron · UIAutomation |
 | [苔溪镇 · Mossbrook Village](xiaozhen/) | <img src="xiaozhen/screenshots/pc-1.jpg" width="220"> | 模块化中世纪小镇与程序化骨骼动画的第三人称漫步。 | three.js · GLTF |
 | [自动视频图文工坊](zidongtuwen/) | <img src="zidongtuwen/screenshots/pc-1.jpg" width="220"> | 文案 → 配图 → 配音 → 字幕 → 成片，本地运行的短视频流水线。 | Python · Flask · Selenium · ffmpeg |
-| [AI 造物馆·智纪元](ai-showcase/) | <img src="ai-showcase/assets/projects/universe/pc-2.jpg" width="220"> | 带账号与审核的作品站：邮箱验证码注册、发布→审核→公开、点赞收藏评论、推荐/降级排序与用户管理。 | Node · Express · SQLite |
 
 ## 快速开始
 
@@ -30,7 +29,6 @@
 | prompt-batch-studio | `npm install && npm start`（Windows + Node 18+） |
 | xiaozhen | `npm install && npm start` → http://localhost:5173 |
 | zidongtuwen | `pip install -r requirements.txt`，复制 `config.example.json` 为 `config.json` 填 Key，`python app.py` |
-| ai-showcase | `cd ai-showcase && npm install && npm run seed && npm start` → http://127.0.0.1:3000 |
 
 ## 目录
 
@@ -41,7 +39,6 @@ official-demo-02-racing/  程序化城市赛车
 prompt-batch-studio/      Electron 批量提示词工作台
 xiaozhen/                 3D 中世纪小镇漫步
 zidongtuwen/              本地视频图文流水线
-ai-showcase/              AI 作品展示站
 ```
 
 ## 关于仓库体积
@@ -52,14 +49,12 @@ ai-showcase/              AI 作品展示站
 - 3D 素材源包（`.zip`、`.blend`、`.fbx`、原始素材目录），只保留转换后的 GLB
 - 运行数据、日志、浏览器配置、成片缓存
 - 含 API Key 的本地配置（`zidongtuwen/config.json`，请从 `config.example.json` 复制）
-- 展示站后端数据（`ai-showcase/server/data/` 的 SQLite 与上传图片）与 `.env`
 
 ## 提交新项目
 
 1. 在根目录新建项目文件夹，补一个 README（介绍 / 玩法 / 技术栈 / 6 张截图）；
 2. 截图统一放在 `screenshots/pc-1.jpg` 到 `pc-4.jpg`、`mobile-1.jpg`、`mobile-2.jpg`；
-3. 在 `ai-showcase/data/projects.js` 里加一条作品数据，把截图复制到 `ai-showcase/assets/projects/<slug>/`；
-4. 更新本 README 的项目表。
+3. 更新本 README 的项目表。
 
 ## 许可
 
