@@ -597,3 +597,77 @@ footer b { color: var(--ink); }
   .foot-actions { justify-content: flex-end; }
   footer { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
+
+/* ---------------- 分页 ---------------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 30px;
+}
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  transition: all 0.16s;
+}
+.page-btn:hover:not(:disabled):not(.active) { border-color: #c9cdf0; color: var(--ink); }
+.page-btn.active { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 650; }
+.page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ---------------- 手机悬浮上传 ---------------- */
+.fab {
+  position: fixed;
+  right: 18px;
+  bottom: 22px;
+  z-index: 60;
+  display: none;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  box-shadow: 0 14px 30px -10px rgba(79, 70, 229, 0.72);
+  transition: transform 0.2s;
+}
+.fab:hover { transform: translateY(-2px) scale(1.03); }
+@media (max-width: 720px) { .fab { display: grid; } }
+
+/* ---------------- 公众号卡片 ---------------- */
+.wechat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 22px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.wechat-label { font-size: 10px; letter-spacing: 0.14em; color: #7dd3a8; font-weight: 700; }
+.wechat-card strong { font-size: 21px; letter-spacing: -0.02em; color: #fff; line-height: 1.3; }
+.wechat-hint { font-size: 12px; color: #a9b0cc; line-height: 1.6; }
+
+.card-foot .date { font-variant-numeric: tabular-nums; letter-spacing: 0.01em; }
+
+.wechat-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #101223, #1d2140);
+}
+.wechat-mini .wechat-label { color: #7dd3a8; }
+.wechat-mini strong { font-size: 18px; color: #fff; letter-spacing: -0.01em; line-height: 1.3; }
+.wechat-mini .wechat-hint { font-size: 11.5px; color: #a9b0cc; line-height: 1.6; }

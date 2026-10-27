@@ -1,9 +1,9 @@
-/* 作品详情页：从 data/projects.js 与 IndexedDB 读取数据，平铺展示 4 张 PC + 2 张手机截图 */
+/* 作品详情页：4 张 PC + 2 张手机截图平铺、介绍与玩法折叠、发布日期、公众号 */
 (() => {
   'use strict';
 
   const SEED = Array.isArray(window.SEED_PROJECTS) ? window.SEED_PROJECTS : [];
-  const SITE = window.SITE || { qq: '993739647', repo: 'https://github.com/jkl123456/All' };
+  const SITE = window.SITE || { qq: '993739647', wechat: '智纪元AD' };
   const DB_NAME = 'ai-maker-gallery';
   const STORE = 'projects';
 
@@ -17,6 +17,16 @@
     el.classList.add('show');
     clearTimeout(toast._timer);
     toast._timer = setTimeout(() => el.classList.remove('show'), 2400);
+  }
+
+  function formatDate(project) {
+    if (project.date) return project.date;
+    if (project.createdAt) {
+      const d = new Date(project.createdAt);
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    }
+    return '';
   }
 
   async function loadCustom() {
@@ -42,10 +52,13 @@
   }
 
   function renderNotFound() {
+    document.title = '没有找到这件作品 · AI 造物馆·智纪元';
+    $('#dCats').innerHTML = '';
     $('#dName').textContent = '没有找到这件作品';
     $('#dTagline').textContent = '链接可能不完整，或者作品存放在另一台设备的浏览器里。';
     $('#dShots').innerHTML = '';
     $('#dDesc').innerHTML = '<p>回到作品墙重新选择一件作品。</p>';
+    $('#dDesc').classList.remove('clamped');
     $('#dActions').innerHTML = '<a class="btn primary" href="index.html">返回作品墙</a>';
   }
 
@@ -107,12 +120,42 @@
       </a>`;
   }
 
+  function setupCollapse(content, button, openText, closeText) {
+    content.classList.add('clamped');
+    button.classList.add('hidden');
+    button.textContent = openText;
+
+    requestAnimationFrame(() => {
+      const overflowing = content.scrollHeight > content.clientHeight + 4;
+      if (!overflowing) {
+        content.classList.remove('clamped');
+        button.classList.add('hidden');
+        return;
+      }
+      button.classList.remove('hidden');
+    });
+
+    button.onclick = () => {
+      const isClamped = content.classList.toggle('clamped');
+      button.textContent = isClamped ? openText : closeText;
+      if (isClamped) {
+        const top = content.getBoundingClientRect().top + window.scrollY - 90;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    };
+  }
+
   function render(project, all) {
-    document.title = `${project.name} · AI 造物馆`;
+    document.title = `${project.name} · AI 造物馆·智纪元`;
 
     $('#dCats').innerHTML = (project.categories || []).map((c) => `<span>${escapeHtml(c)}</span>`).join('');
     $('#dName').textContent = project.name;
     $('#dTagline').textContent = project.tagline || '';
+
+    const date = formatDate(project);
+    $('#dDate').textContent = date ? `${date} 发布` : '';
+    if (!date) $('.publish-line').style.display = 'none';
+
     $('#dPlatforms').innerHTML = (project.platforms || []).map((p) => `<span>${escapeHtml(p)}</span>`).join('');
     $('#dStack').innerHTML = (project.stack || []).map((s) => `<span>${escapeHtml(s)}</span>`).join('');
 
@@ -129,8 +172,11 @@
       .split(/\n{2,}/)
       .map((p) => `<p>${escapeHtml(p.trim())}</p>`)
       .join('');
+    setupCollapse($('#dDesc'), $('#descToggle'), '展开全文 ↓', '收起 ↑');
 
     $('#dGameplay').innerHTML = (project.gameplay || []).map((g) => `<li>${escapeHtml(g)}</li>`).join('') || '<li>作者没有填写玩法说明。</li>';
+    setupCollapse($('#gameplayWrap'), $('#gameplayToggle'), '展开全部 ↓', '收起 ↑');
+
     $('#dSideStack').innerHTML = (project.stack || []).map((s) => `<span>${escapeHtml(s)}</span>`).join('');
     $('#dSidePlatforms').innerHTML = (project.platforms || []).map((p) => `<span>${escapeHtml(p)}</span>`).join('');
     $('#dContact').innerHTML = renderContact(project);

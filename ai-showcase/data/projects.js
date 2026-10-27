@@ -17,8 +17,9 @@ window.CATEGORIES = [
 ];
 
 window.SITE = {
-  name: 'AI 造物馆',
+  name: 'AI 造物馆·智纪元',
   qq: '993739647',
+  wechat: '智纪元AD',
   owner: 'jkl123456',
   repo: 'https://github.com/jkl123456/All'
 };
@@ -43,6 +44,7 @@ window.SEED_PROJECTS = [
     repo: 'https://github.com/jkl123456/All/tree/main/knowledge-archipelago',
     contactName: 'jkl123456',
     qq: '993739647',
+    date: '2026-10-25',
     cover: 'assets/projects/zhiyu/pc-2.jpg',
     images: [
       { src: 'assets/projects/zhiyu/pc-1.jpg', label: 'pc' },
@@ -72,6 +74,7 @@ window.SEED_PROJECTS = [
     repo: 'https://github.com/jkl123456/All/tree/main/knowledge-universe-3d',
     contactName: 'jkl123456',
     qq: '993739647',
+    date: '2026-10-20',
     cover: 'assets/projects/universe/pc-2.jpg',
     images: [
       { src: 'assets/projects/universe/pc-1.jpg', label: 'pc' },
@@ -101,6 +104,7 @@ window.SEED_PROJECTS = [
     repo: 'https://github.com/jkl123456/All/tree/main/official-demo-02-racing',
     contactName: 'jkl123456',
     qq: '993739647',
+    date: '2026-10-18',
     cover: 'assets/projects/racing/pc-2.jpg',
     images: [
       { src: 'assets/projects/racing/pc-1.jpg', label: 'pc' },
@@ -130,6 +134,7 @@ window.SEED_PROJECTS = [
     repo: 'https://github.com/jkl123456/All/tree/main/prompt-batch-studio',
     contactName: 'jkl123456',
     qq: '993739647',
+    date: '2026-10-24',
     cover: 'assets/projects/prompt-studio/pc-1.jpg',
     images: [
       { src: 'assets/projects/prompt-studio/pc-1.jpg', label: 'pc' },
@@ -159,6 +164,7 @@ window.SEED_PROJECTS = [
     repo: 'https://github.com/jkl123456/All/tree/main/xiaozhen',
     contactName: 'jkl123456',
     qq: '993739647',
+    date: '2026-10-26',
     cover: 'assets/projects/mossbrook/pc-3.jpg',
     images: [
       { src: 'assets/projects/mossbrook/pc-1.jpg', label: 'pc' },
@@ -188,6 +194,7 @@ window.SEED_PROJECTS = [
     repo: 'https://github.com/jkl123456/All/tree/main/zidongtuwen',
     contactName: 'jkl123456',
     qq: '993739647',
+    date: '2026-10-24',
     cover: 'assets/projects/video-workshop/pc-3.jpg',
     images: [
       { src: 'assets/projects/video-workshop/pc-1.jpg', label: 'pc' },
