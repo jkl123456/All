@@ -1,10 +1,10 @@
 # AI 造物实验室
 
-> 六个用 AI 一起做出来的小项目。
+> 八个用 AI 一起做出来的小项目。
 
 **使用许可：仅限个人学习、研究与技术交流，禁止任何商业用途。商业授权请联系作者 QQ 993739647。** 详见 [LICENSE](LICENSE)。
 
-这里每个项目都是完整可运行的：三款 3D 游戏、两套知识可视化、一个桌面自动化工具和一条本地视频流水线。源码全部开源，截图与说明在各自目录的 README 里。
+这里每个项目都是完整可运行的：三款 3D 游戏、两套知识可视化、一个桌面自动化工具、一条本地视频流水线和两套直播互动工具。源码全部开源，截图与说明在各自目录的 README 里。
 
 ## 项目
 
@@ -16,6 +16,8 @@
 | [批量提示词工作台](prompt-batch-studio/) | <img src="prompt-batch-studio/screenshots/pc-1.jpg" width="220"> | Windows 桌面工具：把「写需求 → 粘贴 → 等 AI 写完」整条队列自动化。 | Electron · UIAutomation |
 | [苔溪镇 · Mossbrook Village](xiaozhen/) | <img src="xiaozhen/screenshots/pc-1.jpg" width="220"> | 模块化中世纪小镇与程序化骨骼动画的第三人称漫步。 | three.js · GLTF |
 | [自动视频图文工坊](zidongtuwen/) | <img src="zidongtuwen/screenshots/pc-1.jpg" width="220"> | 文案 → 配图 → 配音 → 字幕 → 成片，本地运行的短视频流水线。 | Python · Flask · Selenium · ffmpeg |
+| [直播间手写签名](zhibo-sign/) | （暂无截图） | 观众弹幕写名字，当场写成沙画签名：拆笔顺、沙粒笔触、配祝福语音，礼物可插队。 | Python · FastAPI · OpenCV · OBS 叠加层 |
+| [直播间头像简笔画](zhibo-xiaoxiang/) | （暂无截图） | 观众扣 1 排队，取头像生成简笔画，拆成一笔一笔在直播画面上实时描出。 | Python · FastAPI · OpenCV · OBS 叠加层 |
 
 ## 快速开始
 
@@ -29,6 +31,8 @@
 | prompt-batch-studio | `npm install && npm start`（Windows + Node 18+） |
 | xiaozhen | `npm install && npm start` → http://localhost:5173 |
 | zidongtuwen | `pip install -r requirements.txt`，复制 `config.example.json` 为 `config.json` 填 Key，`python app.py` |
+| zhibo-sign | `pip install -r requirements.txt`，复制 `config.example.yaml` 为 `config.yaml` 填 Key，`python run.py` → http://127.0.0.1:8850 |
+| zhibo-xiaoxiang | `pip install -r requirements.txt`，复制 `config.example.yaml` 为 `config.yaml` 填 Key，`python run.py` → http://127.0.0.1:8848 |
 
 ## 目录
 
@@ -39,6 +43,8 @@ official-demo-02-racing/  程序化城市赛车
 prompt-batch-studio/      Electron 批量提示词工作台
 xiaozhen/                 3D 中世纪小镇漫步
 zidongtuwen/              本地视频图文流水线
+zhibo-sign/               直播间手写签名（沙画）
+zhibo-xiaoxiang/          直播间头像简笔画
 ```
 
 ## 关于仓库体积
@@ -48,7 +54,8 @@ zidongtuwen/              本地视频图文流水线
 - `node_modules/`、`dist/` 等依赖与构建产物
 - 3D 素材源包（`.zip`、`.blend`、`.fbx`、原始素材目录），只保留转换后的 GLB
 - 运行数据、日志、浏览器配置、成片缓存
-- 含 API Key 的本地配置（`zidongtuwen/config.json`，请从 `config.example.json` 复制）
+- 直播项目（zhibo-sign / zhibo-xiaoxiang）的浏览器登录态（`.chrome-*`）与运行时成图/语音（`data/`）
+- 含 API Key / Cookie / 房间号的本地配置（`zidongtuwen/config.json`、`zhibo-*/config.yaml`，请各自从对应的 `config.example.*` 复制填写）
 
 ## 提交新项目
 
