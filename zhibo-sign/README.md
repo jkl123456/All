@@ -945,3 +945,7 @@ virtual:
 
 `virtual.enabled: false` 可以整块关掉。想看版式又不想排单，用
 `PYTHONPATH=. python scripts/overlay_preview.py`（只跑 overlay，不排单不出图）。
+
+## 许可
+
+仅限个人学习、研究与技术交流使用，**不可用于商业用途**。商业授权请联系作者 QQ 993739647，详见仓库根目录 [LICENSE](../LICENSE)。
