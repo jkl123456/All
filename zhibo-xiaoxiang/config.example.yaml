@@ -1,0 +1,152 @@
+server:
+  host: 127.0.0.1
+  port: 8848
+
+platform:
+  type: douyin
+  mock:
+    interval: 600        # seconds between simulated viewers
+  external:
+    ws_url: "ws://127.0.0.1:9000/events"
+  douyin:
+    room_id: "YOUR_ROOM_ID"  # 直播间房间号（live.douyin.com/xxxxx 后面那串）
+    cookie: "PASTE_YOUR_DOUYIN_COOKIE_HERE"  # 从浏览器复制完整 Cookie
+    ttwid: ""
+    user_unique_id: ""
+    device_id: ""
+    signature: ""       # 会过期，见 README
+    debug: false
+
+draw:
+  canvas: 900           # 笔迹坐标系边长
+  stroke_width: 4.6
+  hold_seconds: 2.5     # 画完后停留展示（每档也可以在 tiers 里单独覆盖）
+  min_stroke_len: 8     # 过滤碎线（tiers 里没写时用这个默认值）
+  simplify: 1.6         # 折线简化容差，越大越"简"
+  stitch_gap: 14        # 端点缝合距离（px），越大线条越连续、笔数越少
+
+# ---------------------------------------------------------------- 礼物档位
+# 按礼物金额（元）从高到低匹配：value >= min_value 命中该档。
+# 免费扣 1 = 简单档；礼物越贵，画的层数越多（线稿 → 阴影 → 上色 → 精细）
+tiers:
+  - key: fine
+    name: 精致画
+    min_value: 50
+    mode: detail          # 边缘描线，细节保留最多
+    min_stroke_len: 5
+    simplify: 1.1
+    stitch_gap: 18
+    stroke_width: 3.9
+    duration: 20.0         # 画多久
+    hatch: true           # 铅笔排线阴影
+    color: true           # 色块上色
+  - key: color
+    name: 彩色
+    min_value: 10
+    mode: detail
+    min_stroke_len: 7
+    simplify: 1.4
+    stitch_gap: 16
+    stroke_width: 4.3
+    duration: 20.0
+    hatch: false
+    color: true
+    fills_k: 5            # 上色时把照片压成几块颜色
+  - key: sketch
+    name: 素描
+    min_value: 1
+    mode: detail
+    min_stroke_len: 8
+    simplify: 1.6
+    stitch_gap: 14
+    stroke_width: 4.6
+    duration: 20.0
+    hatch: true
+    color: false
+  - key: simple
+    name: 简单
+    min_value: 0
+    mode: detail          # 边缘描线 + 强简化 = 速写式的几根主线
+    min_stroke_len: 25
+    simplify: 2.6
+    stitch_gap: 26
+    stroke_width: 5.4
+    duration: 20.0
+    hatch: false
+    color: false
+
+# ---------------------------------------------------------------- 画种
+# 礼物决定画什么，价格档位只决定画多久。评论「999」「关注」和爱心都走素描。
+# 提示词在 prompts/style_*.txt，改画风只改那几个文件，不用动代码。
+styles:
+  default: sketch
+  items:
+    sketch:  { name: 素描, prompt: prompts/style_sketch.txt }
+    anime:   { name: 动漫, prompt: prompts/style_anime.txt }
+    sand:    { name: 沙画, prompt: prompts/style_sand.txt }
+    gouache: { name: 水粉, prompt: prompts/style_gouache.txt }
+  # 礼物名 -> 画种。没列到的礼物走 default。
+  gift_map:
+    小心心: sketch
+    爱心: sketch
+    玫瑰: sketch
+    啤酒: anime
+    花束: sand
+    小黄鸭: gouache
+
+# 礼物名 -> 金额（元）。平台事件里带 value 时优先用事件的。
+gifts:
+  小心心: 0.1
+  玫瑰: 1
+  墨镜: 9
+  跑车: 30
+  嘉年华: 300
+
+sketch:
+  # local    = 本地描边，免费，效果是"照片描边"
+  # seedream = 火山方舟图生图，真正会"画"，0.12 元/张
+  provider: local       # local | seedream
+  local:
+    mode: detail        # detail（边缘描线，干净、笔数少）| portrait（色块边界，更卡通但线多）| canny
+    k: 4                # portrait 模式的色块数量，越小越"简"
+    blur: 3
+  seedream:
+    base_url: "https://ark.cn-beijing.volces.com/api/v3"
+    api_key: ""                                   # 填火山方舟的 API Key
+    model: "doubao-seedream-5-0-flash-260915"     # 0.12/张｜4-0-20260415 是 0.20｜5-0-pro 是 0.30
+    size: "1024x1024"
+    watermark: false
+    prompt: ""          # 留空 = 按档位自动选 ink/pencil/color 三种提示词
+  command:              # provider=command 时使用
+    command: ["python", "scripts/my_sketch.py", "{in}", "{out}"]
+
+queue:
+  max: 20
+  gift_jump: true
+  keyword: ["1", "画", "画画", "求画"]
+
+# ---------------------------------------------------------------- 分区识别
+# 画笔按「头发 → 脸 → 脖子 → 衣服」分开画，而不是整张图从上往下刷。
+# 用 deepseek-flash 看图给出四块的比例坐标，约 3 秒；同样的图只分析一次（有缓存）。
+regions:
+  enabled: true
+  base_url: "https://api.deepseek.com"
+  api_key: "YOUR_DEEPSEEK_API_KEY"
+  model: "deepseek-flash"
+  # This model burns ~2k tokens on hidden reasoning before the four-box reply.
+  # Low effort keeps it near 11 s; a roomy cap stops the JSON being cut short.
+  effort: "low"
+  timeout: 40
+  max_tokens: 3000
+
+# ---------------------------------------------------------------- 空场保底
+# 队列空了就轮流画 data/virtual/ 里的图，配上虚拟昵称，当作新观众进来。
+# 真实订单会插到虚拟单前面，不会让真人等。
+virtual:
+  enabled: true
+  dir: "data/virtual"
+  value: 1            # 按 ¥1 定档 = 素描
+  names: []           # 留空用内置的 20 个昵称
+
+paths:
+  data: data

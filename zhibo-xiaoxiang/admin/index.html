@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>直播后台 · 头像手绘</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #14110f; color: #e9ddcb;
+    font: 15px/1.6 "Microsoft YaHei", system-ui, sans-serif;
+  }
+  header {
+    display: flex; align-items: center; gap: 18px;
+    padding: 16px 24px; background: #1d1815;
+    border-bottom: 1px solid #2e2723;
+    position: sticky; top: 0; z-index: 5;
+  }
+  h1 { font-size: 19px; margin: 0; font-weight: 700; letter-spacing: 1px; }
+  h1 span { color: #8a7b68; font-weight: 400; font-size: 13px; margin-left: 8px; }
+  h2 {
+    font-size: 14px; margin: 0 0 10px; color: #b9a68d;
+    font-weight: 600; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2 .n { color: #ffd47a; }
+  button {
+    font: inherit; font-size: 13px; cursor: pointer;
+    background: #2a241f; color: #e9ddcb;
+    border: 1px solid #3b322b; border-radius: 8px;
+    padding: 7px 14px; transition: .15s;
+  }
+  button:hover { background: #362e27; border-color: #55483d; }
+  button.on { background: #2f4a35; border-color: #4a7a55; color: #b9e8c3; }
+  button.warn { background: #4a2724; border-color: #7a3b36; color: #ffb3a0; }
+  button.mini { padding: 3px 9px; font-size: 12px; border-radius: 6px; }
+  .acts { margin-left: auto; display: flex; gap: 8px; }
+
+  main {
+    display: grid; grid-template-columns: minmax(520px, 1fr) 340px;
+    gap: 18px; padding: 18px 24px 40px; align-items: start;
+  }
+  /* Explicit placement: with auto-flow the gallery landed in the narrow right
+     column, squeezing the thumbnails to two per row. Both panels belong in the
+     wide column, the aside keeps the right one for its whole height. */
+  main > section.panel { grid-column: 1; }
+  main > aside { grid-column: 2; grid-row: 2 / span 99; }
+  .stats { grid-column: 1 / -1; display: grid; gap: 12px;
+           grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.7fr); }
+  .card {
+    background: #1d1815; border: 1px solid #2e2723; border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .card .k { font-size: 12px; color: #8a7b68; letter-spacing: 1px; }
+  .card .v { font-size: 26px; font-weight: 700; color: #ffd47a; margin-top: 2px; }
+  .card .v small { font-size: 13px; color: #8a7b68; font-weight: 400; margin-left: 4px; }
+  /* Long nicknames wrap and push the row taller; clip them instead. */
+  .card.now .v { font-size: 17px; color: #f0e0c8; white-space: nowrap;
+                 overflow: hidden; text-overflow: ellipsis; }
+
+  .panel {
+    background: #1d1815; border: 1px solid #2e2723; border-radius: 12px;
+    padding: 16px 18px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left; font-weight: 500; color: #8a7b68; font-size: 12px;
+    padding: 6px 8px; border-bottom: 1px solid #2e2723; letter-spacing: 1px;
+  }
+  td { padding: 9px 8px; border-bottom: 1px solid #241e1a; }
+  tr:hover td { background: #221c18; }
+  .idx { color: #6f6354; width: 34px; }
+  .nick { color: #f2e4cd; }
+  .muted { color: #7d6f5f; font-size: 12px; }
+  .pill {
+    display: inline-block; font-size: 11px; padding: 1px 8px;
+    border-radius: 999px; background: #2a241f; color: #a2917a;
+    border: 1px solid #3b322b;
+  }
+  .pill.gift { background: #43251f; color: #ffb3a0; border-color: #6b3a30; }
+  .pill.virtual { background: #232c3a; color: #9dc3e8; border-color: #33465c; }
+  .pill.ai { background: #2c2a3f; color: #c0b6ff; border-color: #423d63; }
+  .empty { color: #6f6354; padding: 24px 8px; text-align: center; }
+
+  aside { display: flex; flex-direction: column; gap: 18px; }
+  label { display: block; font-size: 12px; color: #8a7b68; margin: 10px 0 4px; }
+  input, select {
+    width: 100%; font: inherit; font-size: 14px;
+    background: #241e1a; color: #e9ddcb;
+    border: 1px solid #3b322b; border-radius: 8px; padding: 8px 10px;
+  }
+  input:focus, select:focus { outline: none; border-color: #6b5a48; }
+  form button { width: 100%; margin-top: 14px; background: #3a2f24; border-color: #5a4a38; }
+  #logs {
+    margin: 0; height: 260px; overflow: auto; font-size: 12px; line-height: 1.7;
+    color: #9c8d7a; background: #171310; border: 1px solid #2a231e;
+    border-radius: 8px; padding: 10px 12px; white-space: pre-wrap;
+  }
+  .tip { font-size: 12px; color: #7d6f5f; margin-top: 8px; line-height: 1.5; }
+
+  /* --------------------------------------------------- virtual gallery */
+  .vhead { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .vhead .sp { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .vdrop {
+    border: 1px dashed #4a3f34; border-radius: 10px;
+    padding: 20px; text-align: center; color: #8a7b68; font-size: 13px;
+    transition: .15s; margin-bottom: 12px;
+  }
+  .vdrop.hot { border-color: #a2917a; background: #241e1a; color: #e0cdb4; }
+  .vgrid {
+    display: grid; gap: 10px; justify-content: start;
+    /* Fixed track size rather than 1fr: with only a few pictures uploaded the
+       flexible tracks leave one huge tile per row. */
+    grid-template-columns: repeat(auto-fill, 132px);
+  }
+  .vcell {
+    position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+    background: #241e1a; border: 1px solid #3b322b;
+  }
+  .vcell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vcell .vn {
+    position: absolute; left: 6px; bottom: 4px; font-size: 11px;
+    color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.9); letter-spacing: .5px;
+  }
+  .vcell .vx {
+    position: absolute; right: 4px; top: 4px; width: 21px; height: 21px;
+    padding: 0; line-height: 1; border-radius: 50%; font-size: 12px;
+    background: rgba(18,13,10,.75); border-color: rgba(255,255,255,.16);
+  }
+  .vcell .vx:hover { background: #7a3b36; border-color: #a3554d; }
+  .vempty { color: #6f6354; font-size: 13px; padding: 14px 2px; }
+  #upTip { font-size: 12px; color: #9dc3e8; }
+</style>
+</head>
+<body>
+<header>
+  <h1>直播后台<span>头像手绘 · 管理端</span></h1>
+  <div class="acts">
+    <button id="btnPause">暂停接单</button>
+    <button id="btnSkip">跳过当前</button>
+    <button id="btnClear" class="warn">清空队列</button>
+    <button id="btnVirtual">虚拟队列</button>
+    <a href="/" target="_blank"><button>打开直播画面</button></a>
+  </div>
+</header>
+
+<main>
+  <div class="stats">
+    <div class="card"><div class="k">排队中</div><div class="v" id="sQueue">0</div></div>
+    <div class="card now"><div class="k">正在画</div><div class="v" id="sNow">—</div></div>
+    <div class="card"><div class="k">已完成</div><div class="v" id="sDone">0</div></div>
+    <div class="card"><div class="k">虚拟图库</div><div class="v" id="sVirt">0 <small>张</small></div></div>
+    <div class="card"><div class="k">观看端</div><div class="v" id="sOv">0 <small>个</small></div></div>
+  </div>
+
+  <section class="panel">
+    <h2>全部排队 <span class="n" id="qcount">0</span>
+      <span class="muted" style="font-weight:400">真实订单会插到虚拟单前面</span></h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>昵称</th><th>来源</th><th>画种</th><th>等待</th><th></th></tr>
+      </thead>
+      <tbody id="qbody"></tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <div class="vhead">
+      <h2 style="margin:0">虚拟图库 <span class="n" id="vcount">0</span>
+        <span class="muted" style="font-weight:400">张</span></h2>
+      <div class="sp">
+        <span id="upTip"></span>
+        <button id="btnVUp">上传图片</button>
+        <button id="btnVClear" class="warn mini">清空</button>
+      </div>
+    </div>
+    <div class="vdrop" id="vdrop">
+      把图片拖到这里，或点右上角「上传图片」· 支持 jpg / png / webp，可多选
+    </div>
+    <div class="vgrid" id="vgrid"></div>
+    <div class="vempty" id="vempty" hidden>
+      图库还是空的。传几张进来，队列没人的时候就会按顺序循环画它们。
+    </div>
+    <div class="tip" id="vtip">
+      播放规则：<b>没有真实订单</b>时，按顺序循环画图库里的图（每张配一个不同的虚拟昵称）；
+      <b>有真实订单</b>时它们会插到虚拟单前面先画，虚拟单退到后面等着。<br>
+      图会<b>原样</b>被"画"出来，所以请放成品素描图（白底最佳，透明底会自动铺白）；上传后按 v01、v02… 自动编号，删掉中间某张不会打乱其余顺序。
+    </div>
+    <input type="file" id="vfile" accept="image/*" multiple hidden>
+  </section>
+
+  <aside>
+    <section class="panel">
+      <h2>手动加单</h2>      <form id="addForm">
+        <label>昵称</label>
+        <input id="fNick" placeholder="观众昵称" maxlength="24">
+        <label>画种</label>
+        <select id="fStyle"></select>
+        <label>档位（决定画多久）</label>
+        <select id="fTier"></select>
+        <button type="submit">加入队列</button>
+      </form>
+      <div class="tip">加单会走和直播弹幕一样的流程：先出图，再排到队尾。</div>
+    </section>
+
+    <section class="panel">
+      <h2>运行日志</h2>
+      <pre id="logs"></pre>
+    </section>
+  </aside>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const KIND = { chat: '扣1', gift: '礼物', manual: '手动', ai: '豆包', virtual: '虚拟' };
+const PILL = { gift: 'gift', virtual: 'virtual', ai: 'ai' };
+
+let tiers = [];
+let paused = false;
+let virtualOn = true;
+
+async function call(path, body) {
+  const opt = body
+    ? { method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body) }
+    : undefined;
+  const r = await fetch(path, opt);
+  return r.json();
+}
+
+function fmtWait(s) {
+  const v = Math.max(0, Math.round(s || 0));
+  if (v < 60) return v + ' 秒';
+  return Math.floor(v / 60) + ' 分 ' + (v % 60) + ' 秒';
+}
+
+function render(s) {
+  paused = !!s.paused;
+  const v = s.virtual || {};
+  virtualOn = !!v.enabled;
+
+  $('sQueue').textContent = (s.queue || []).length;
+  $('sDone').textContent = s.done || 0;
+  $('sVirt').innerHTML = (v.pictures || 0) + ' <small>张</small>';
+  $('sOv').innerHTML = (s.overlays || 0) + ' <small>个</small>';
+
+  const cur = s.current;
+  $('sNow').textContent = cur
+    ? '@' + cur.nickname + ' · ' + (cur.tier_name || '')
+    : '空闲';
+
+  $('btnPause').textContent = paused ? '继续接单' : '暂停接单';
+  $('btnPause').classList.toggle('on', paused);
+  $('btnVirtual').textContent = virtualOn ? '虚拟队列：开' : '虚拟队列：关';
+  $('btnVirtual').classList.toggle('on', virtualOn);
+
+  if (!tiers.length && s.tiers) {
+    tiers = s.tiers;
+    $('fTier').innerHTML = tiers
+      .map((t) => `<option value="${t.key}">${t.name}（¥${t.min_value}）</option>`)
+      .join('');
+  }
+  if (!$('fStyle').options.length && s.styles) {
+    $('fStyle').innerHTML = s.styles
+      .map((x) => `<option value="${x.key}">${x.name}</option>`).join('');
+  }
+
+  const q = s.queue || [];
+  $('qcount').textContent = q.length;
+  renderLib(s.virtual_files || []);
+  if (!q.length) {
+    $('qbody').innerHTML = '<tr><td colspan="6" class="empty">队列是空的，虚拟保底会顶上</td></tr>';
+  } else {
+    $('qbody').innerHTML = q.map((o, i) => `
+      <tr>
+        <td class="idx">${i + 1}</td>
+        <td class="nick">@${o.nickname}</td>
+        <td><span class="pill ${PILL[o.kind] || ''}">${KIND[o.kind] || o.kind}</span></td>
+        <td>${o.style_name || o.tier_name || '素描'}</td>
+        <td class="muted">${fmtWait(o.waited)}</td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="mini" data-bump="${o.seq}">置顶</button>
+          <button class="mini warn" data-drop="${o.seq}">移除</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  const logs = $('logs');
+  const atBottom = logs.scrollTop + logs.clientHeight >= logs.scrollHeight - 30;
+  logs.textContent = (s.logs || []).join('\n');
+  if (atBottom) logs.scrollTop = logs.scrollHeight;
+}
+
+async function tick() {
+  try { render(await call('/api/admin/state')); }
+  catch (e) { /* server restarting; next tick will pick it up */ }
+}
+
+$('btnPause').onclick = async () => {
+  render(await call('/api/admin/action', { action: paused ? 'resume' : 'pause' }));
+};
+$('btnSkip').onclick = async () => {
+  render(await call('/api/admin/action', { action: 'skip' }));
+};
+$('btnClear').onclick = async () => {
+  if (!confirm('清空所有排队？正在画的那张不受影响。')) return;
+  render(await call('/api/admin/action', { action: 'clear' }));
+};
+$('btnVirtual').onclick = async () => {
+  render(await call('/api/admin/action',
+    { action: virtualOn ? 'virtual_off' : 'virtual_on' }));
+};
+
+$('qbody').onclick = async (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const seq = b.dataset.bump || b.dataset.drop;
+  if (!seq) return;
+  render(await call('/api/admin/action',
+    { action: b.dataset.bump ? 'bump' : 'drop', seq: Number(seq) }));
+};
+
+$('addForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const nick = $('fNick').value.trim();
+  if (!nick) return;
+  await call('/api/admin/action', { action: 'add', nickname: nick,
+                                    tier: $('fTier').value,
+                                    style: $('fStyle').value });
+  $('fNick').value = '';
+  tick();
+};
+
+tick();
+setInterval(tick, 1500);
+
+/* ------------------------------------------------------- virtual library
+   Thumbnails are rebuilt only when the folder actually changed -- redrawing
+   them on every 1.5 s poll would reload every <img> and flicker. */
+let vSig = '';
+function renderLib(items) {
+  const sig = items.map((i) => i.name + ':' + i.mtime).join('|');
+  if (sig === vSig) return;
+  vSig = sig;
+  $('vcount').textContent = items.length;
+  $('vempty').hidden = items.length > 0;
+  $('vgrid').innerHTML = items.map((i) => `
+    <div class="vcell" title="${i.name} · ${i.kb}KB">
+      <img src="${i.url}?t=${i.mtime}" alt="">
+      <span class="vn">${i.name.replace(/\.[^.]+$/, '')}</span>
+      <button class="vx" data-vdel="${i.name}" title="删除">×</button>
+    </div>`).join('');
+}
+
+$('vgrid').onclick = async (e) => {
+  const b = e.target.closest('[data-vdel]');
+  if (!b) return;
+  const name = b.dataset.vdel;
+  if (!confirm(`删除 ${name}？`)) return;
+  const r = await fetch('/api/admin/virtual/delete', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  const j = await r.json();
+  if (!j.ok) alert(j.error || '删除失败');
+  vSig = '';
+  tick();
+};
+
+$('btnVUp').onclick = () => $('vfile').click();
+
+$('vfile').onchange = async (e) => {
+  await upload([...e.target.files]);
+  e.target.value = '';
+};
+
+async function upload(files) {
+  const imgs = files.filter((f) => f.type.startsWith('image/'));
+  if (!imgs.length) return;
+  const bad = [];
+  for (let i = 0; i < imgs.length; i++) {
+    $('upTip').textContent = `上传中 ${i + 1}/${imgs.length}`;
+    try {
+      const r = await fetch('/api/admin/virtual/upload', {
+        method: 'POST',
+        headers: { 'content-type': imgs[i].type || 'application/octet-stream' },
+        body: imgs[i],
+      });
+      const j = await r.json();
+      if (!j.ok) bad.push(imgs[i].name + '：' + (j.error || '失败'));
+    } catch (err) {
+      bad.push(imgs[i].name + '：网络错误');
+    }
+  }
+  $('upTip').textContent = bad.length ? `有 ${bad.length} 张没传上` : '';
+  if (bad.length) alert(bad.join('\n'));
+  vSig = '';
+  tick();
+  setTimeout(() => { $('upTip').textContent = ''; }, 4000);
+}
+
+/* Drag and drop onto the dashed box (or anywhere in the panel). */
+const drop = $('vdrop');
+['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => {
+  e.preventDefault();
+  drop.classList.add('hot');
+}));
+['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => {
+  e.preventDefault();
+  drop.classList.remove('hot');
+}));
+drop.addEventListener('drop', (e) => upload([...(e.dataTransfer?.files || [])]));
+drop.addEventListener('click', () => $('vfile').click());
+
+$('btnVClear').onclick = async () => {
+  if (!confirm('清空整个虚拟图库？图片会从磁盘删除。')) return;
+  const r = await fetch('/api/admin/virtual/clear', { method: 'POST' });
+  const j = await r.json();
+  if (!j.ok) alert(j.error || '清空失败');
+  vSig = '';
+  tick();
+};
+</script>
+</body>
+</html>

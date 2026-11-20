@@ -1,0 +1,435 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #14100d;
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  display: grid;
+  place-items: center;
+}
+
+#stage {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  transform-origin: center center;
+  background: #6d4526;
+  overflow: hidden;
+}
+
+/* ----------------------------------------------------------------- desk
+   A wooden table top: plank seams every 168px, a fine grain on top of that
+   and a warm light falling from the upper left. Pure gradients -- a photo
+   texture would fight the flat paper and the ink drawing. */
+.desk {
+  position: absolute; inset: 0;
+  background-color: #7d5230;
+  background-image:
+    repeating-linear-gradient(90.3deg,
+      rgba(255,255,255,.030) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(89.1deg,
+      rgba(0,0,0,.10) 0 1px, rgba(0,0,0,.025) 1px 4px, transparent 4px 14px),
+    repeating-linear-gradient(90deg,
+      transparent 0 168px, rgba(0,0,0,.20) 168px 173px,
+      rgba(255,255,255,.03) 173px 175px, transparent 175px 336px),
+    linear-gradient(178deg, #8b5d37 0%, #7c4f2c 46%, #6a4224 100%);
+}
+.desk-light {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(900px 820px at 40% 26%, rgba(255,242,220,.22), transparent 66%),
+    radial-gradient(1500px 1600px at 52% 58%, transparent 48%, rgba(24,12,4,.58) 100%);
+}
+
+/* ---------------------------------------------------------------- top */
+.topbar {
+  position: absolute; top: 56px; left: 0; right: 0;
+  padding: 0 64px;
+  display: flex; justify-content: space-between; align-items: center;
+  color: #f9ecd8;
+  z-index: 8;
+}
+.brand {
+  font-size: 36px; font-weight: 700; letter-spacing: 2px;
+  text-shadow: 0 4px 16px rgba(0,0,0,.65);
+}
+.counter {
+  font-size: 26px; color: #f0dcc0;
+  background: rgba(24,14,8,.42);
+  padding: 10px 22px; border-radius: 999px;
+  border: 1px solid rgba(255,235,205,.22);
+  backdrop-filter: blur(6px);
+}
+.counter b { color: #ffd47a; font-size: 30px; }
+
+/* --------------------------------------------------------------- stack
+   Finished drawings, stacked on the desk in the top-left corner. Newest on
+   top, each sheet nudged and rotated a little so it reads as a pile. The
+   pile and the phone share the top band, one half of the frame each. */
+.stack {
+  position: absolute; left: 46px; top: 626px;
+  width: 400px; height: 480px;
+  /* Sits under the gift menu, which now owns the corner, so the pile is
+     nudged down and trimmed a little; the bottom edge tucks behind the sheet. */
+  transform: scale(.92); transform-origin: top left;
+  z-index: 4;
+}
+.sheet {
+  position: absolute; left: 0; top: 0;
+  width: 304px; height: 352px;
+  background: #fffdf7;
+  border-radius: 5px;
+  padding: 11px 11px 42px;
+  box-shadow: 0 24px 40px rgba(0,0,0,.45), 0 2px 0 rgba(0,0,0,.10);
+  animation: sheetIn .45s cubic-bezier(.2,1.4,.4,1) both;
+}
+@keyframes sheetIn {
+  from { opacity: 0; transform: translate(40px, -40px) rotate(14deg) scale(.9); }
+}
+.sheet:nth-child(1) { transform: rotate(3.2deg) translate(30px, 16px); z-index: 3; }
+.sheet:nth-child(2) { transform: rotate(-6deg) translate(0, -16px); z-index: 2; }
+.sheet:nth-child(3) { transform: rotate(1.2deg) translate(14px, 34px); z-index: 1; }
+/* Only the sheet on top shows its caption; the ones underneath would
+   otherwise read as stray labels floating on the pile. */
+.sheet:nth-child(n+2) .cap { display: none; }
+.sheet .shot {
+  width: 100%; height: 100%;
+  background-color: #f3ede1;
+  background-size: cover; background-position: center 18%;
+  border-radius: 2px;
+}
+.sheet .cap {
+  position: absolute; left: 11px; right: 11px; bottom: 7px;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  font-size: 19px; color: #7d6a53;
+}
+.sheet .cap .cn {
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.sheet .cap .cs {
+  flex: 0 0 auto; font-size: 22px; font-weight: 800; color: #c1443a;
+  font-family: "Georgia", serif;
+}
+
+/* ---------------------------------------------------------------- props
+   A couple of coloured pencils left lying on the table, like the reference
+   frame. Flat shapes with a drop shadow read fine at streaming size. */
+.props { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.prop {
+  position: absolute;
+  width: 30px; height: 236px;
+  border-radius: 4px;
+  clip-path: polygon(0 0, 100% 0, 100% 87%, 50% 100%, 0 87%);
+  background: linear-gradient(180deg,
+      var(--c) 0 84%, #e9cba4 84% 94%, #2b2b2b 94% 100%);
+  filter: drop-shadow(4px 10px 8px rgba(0,0,0,.35));
+  opacity: .92;
+}
+
+/* ---------------------------------------------------------------- rules
+   Gift-to-style menu, floating in the top-left corner. The source was a
+   green-screen graphic and the background is keyed out in the asset itself,
+   so the card supplies the backing: a 50% black plate that lifts the white
+   type off the desk no matter how bright the wood grain behind it is. */
+.rules {
+  position: absolute; left: 36px; top: 142px;
+  width: 250px;
+  padding: 14px 12px 12px;
+  border-radius: 20px;
+  background: rgba(0,0,0,.5);
+  box-shadow: 0 20px 44px rgba(0,0,0,.46), inset 0 0 0 1px rgba(255,255,255,.07);
+  z-index: 6; pointer-events: none;
+}
+.rules img { display: block; width: 100%; }
+.rules-note {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 20px; font-weight: 700;
+  letter-spacing: .12em;
+  color: #ffd47a;
+  text-shadow: 0 2px 10px rgba(0,0,0,.65);
+}
+
+/* --------------------------------------------------------------- phone
+   The order list lives on a phone lying on the table, not in a floating
+   panel: it gives the frame a subject and keeps the queue out of the drawing. */
+.phone {
+  position: absolute; right: 40px; top: 112px;
+  width: 300px; height: 540px;
+  /* Scaled up to fill the right half of the top band. Scaling the whole box
+     (rather than resizing it) matters: the screen is laid out in fixed px, so
+     resizing would reflow the five queue rows differently from this frame. */
+  transform: scale(1.52); transform-origin: top right;
+  z-index: 5;
+}
+.ph-body {
+  position: relative; z-index: 2;
+  width: 300px; height: 540px;
+  border-radius: 42px;
+  padding: 11px;
+  background: linear-gradient(158deg, #464b54 0%, #1a1e24 38%, #0b0d11 100%);
+  box-shadow: 0 30px 54px rgba(0,0,0,.55), inset 0 0 0 2px rgba(255,255,255,.07);
+}
+.ph-notch {
+  position: absolute; left: 50%; top: 17px; transform: translateX(-50%);
+  width: 80px; height: 18px; border-radius: 10px;
+  background: #07090c; z-index: 4;
+}
+.ph-screen {
+  position: relative;
+  width: 100%; height: 100%;
+  border-radius: 32px; overflow: hidden;
+  background: radial-gradient(130% 70% at 50% 0%, #202838 0%, #0e1218 62%);
+  padding: 30px 12px 12px;
+  display: flex; flex-direction: column;
+}
+.ph-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 19px; color: #e9f0f7; letter-spacing: .5px;
+}
+.ph-app { font-weight: 700; }
+.ph-live {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; color: #ff8b7f;
+}
+.ph-live i {
+  width: 9px; height: 9px; border-radius: 50%; background: #ff5b4d;
+  box-shadow: 0 0 10px #ff5b4d; animation: pulse 1.6s infinite;
+}
+.ph-count {
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 17px; color: #c7d3e0;
+}
+.ph-count b { color: #ffd47a; font-size: 21px; }
+.ph-foot {
+  margin-top: auto; text-align: center;
+  font-size: 13px; color: #5d6b7c; letter-spacing: 1px;
+}
+
+/* ---------------------------------------------------------------- paper */
+/* The sheet in progress sits bottom-right. It is designed at 960x1180 and
+   scaled as a whole: scaling the box (instead of resizing the canvas and the
+   pen separately) keeps the pencil glued to the drawing point. */
+.paper {
+  position: absolute; left: 318px; top: 972px;
+  width: 960px; height: 1180px;
+  transform: scale(.76); transform-origin: top left;
+  background: linear-gradient(170deg, #fffdf8 0%, #fdf7ec 60%, #f7efe0 100%);
+  border-radius: 8px;
+  box-shadow: 0 34px 64px rgba(0,0,0,.55), 0 4px 0 rgba(0,0,0,.10);
+  padding: 46px 30px 0;
+  z-index: 6;
+}
+.paper::after {
+  content: ""; position: absolute; inset: 0; border-radius: 8px;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(180,160,130,.08) 0 1px, transparent 1px 4px);
+  pointer-events: none;
+}
+.tape {
+  position: absolute; top: -26px; width: 190px; height: 54px;
+  background: rgba(232, 214, 170, .82);
+  border-left: 1px dashed rgba(160,140,110,.5);
+  border-right: 1px dashed rgba(160,140,110,.5);
+  box-shadow: 0 3px 9px rgba(0,0,0,.22);
+}
+.tape.left { left: 60px; transform: rotate(-4deg); }
+.tape.right { right: 60px; transform: rotate(5deg); }
+
+/* ---------------------------------------------------------------- head */
+.head {
+  height: 132px;
+  display: flex; align-items: center; gap: 22px;
+  padding: 0 26px;
+  border-bottom: 3px solid #ece0c9;
+}
+.avatar-wrap { position: relative; width: 92px; height: 92px; flex: 0 0 92px; }
+.avatar {
+  width: 92px; height: 92px; border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 6px 18px rgba(120,90,50,.30);
+  background: #eee;
+}
+/* Stand-in orders carry no viewer photo, so the tile shows the initial
+   instead of a broken image icon. */
+.avatar-init {
+  position: absolute; inset: 0; border-radius: 50%;
+  display: none; align-items: center; justify-content: center;
+  font-size: 42px; font-weight: 700; color: #8a6432;
+  background: linear-gradient(150deg, #ffeccd, #f5d6a8);
+  border: 4px solid #fff;
+  box-shadow: 0 6px 18px rgba(120,90,50,.30);
+}
+.avatar-wrap.no-photo .avatar { display: none; }
+.avatar-wrap.no-photo .avatar-init { display: flex; }
+.who { flex: 1; min-width: 0; }
+.nick {
+  font-size: 42px; font-weight: 700; color: #2c2318;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 560px;
+}
+.sub { font-size: 24px; color: #96856c; margin-top: 6px; letter-spacing: 1px; }
+
+/* gift tier stamp: cheap -> plain outline, expensive -> gold */
+.tier {
+  padding: 10px 20px 8px;
+  border: 2px solid currentColor;
+  border-radius: 12px;
+  font-size: 26px; font-weight: 800; letter-spacing: 2px;
+  transform: rotate(-5deg) scale(.86);
+  opacity: 0;
+  transition: opacity .3s, transform .3s cubic-bezier(.2,1.7,.4,1);
+  white-space: nowrap;
+}
+.tier.on { opacity: 1; transform: rotate(-5deg) scale(1); }
+.t-simple { color: #7d7060; }
+.t-sketch { color: #6d4f2c; }
+.t-color  { color: #c9541d; }
+.t-fine   { color: #a97c14;
+            background: linear-gradient(180deg, rgba(255,214,110,.45), rgba(255,186,47,.20)); }
+
+.scorebox {
+  width: 128px; text-align: center;
+  opacity: 0; transform: scale(.7) rotate(-8deg);
+  transition: opacity .35s, transform .35s cubic-bezier(.2,1.7,.4,1);
+}
+.scorebox.on { opacity: 1; transform: scale(1) rotate(-6deg); }
+.score {
+  font-size: 62px; font-weight: 800; color: #e0483c;
+  font-family: "Georgia", serif; line-height: 1;
+  text-shadow: 0 2px 0 #ffd9d3;
+}
+.scorelabel {
+  font-size: 20px; color: #b6a48a; letter-spacing: 3px; margin-top: 2px;
+}
+
+/* ---------------------------------------------------------------- draw */
+.draw-area {
+  position: relative;
+  width: 900px; height: 900px;
+  margin: 12px auto 0;
+}
+#ink, #wash {
+  position: absolute; inset: 0;
+  width: 900px; height: 900px;
+}
+#wash { z-index: 2; }
+#ink { z-index: 3; }
+.grid {
+  position: absolute; inset: 0; z-index: 1; opacity: .5;
+  background-image:
+    linear-gradient(rgba(200,185,160,.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,185,160,.22) 1px, transparent 1px);
+  background-size: 90px 90px;
+}
+
+#pen {
+  position: absolute;
+  left: -195px; top: -195px;      /* tip sits at local (195,195) of the 390px box */
+  width: 390px; height: 390px;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform;
+  filter: drop-shadow(6px 14px 12px rgba(0,0,0,.26));
+  transition: opacity .3s;
+}
+#pen.hidden { opacity: 0; }
+.tipshadow {
+  position: absolute; left: 176px; top: 185px; width: 40px; height: 14px;
+  background: radial-gradient(rgba(0,0,0,.28), transparent 70%);
+  border-radius: 50%;
+}
+
+.foot {
+  height: 90px; display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: #a2917a; letter-spacing: 2px;
+}
+
+/* ------------------------------------------------------------ queue list
+   Rendered inside the phone screen, so it is light-on-dark and compact. */
+.hud-queue {
+  margin-top: 12px; display: flex; flex-direction: column; gap: 7px;
+  font-size: 17px; color: #bcc9d8;
+}
+.hud-queue .qempty { padding: 12px 0 2px; color: #6b7a8b; letter-spacing: 1px; }
+.qitem {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.06);
+  border-radius: 11px; padding: 7px 9px;
+  animation: qin .34s ease-out both;
+}
+@keyframes qin { from { opacity: 0; transform: translateX(-14px); } }
+.qno {
+  width: 24px; height: 24px; flex: 0 0 24px; border-radius: 50%;
+  background: rgba(255,212,122,.16); color: #ffd47a;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+}
+.qname {
+  flex: 1; min-width: 0; overflow: hidden;
+  white-space: nowrap; text-overflow: ellipsis; color: #eef4fb;
+}
+.qtag {
+  flex: 0 0 auto;
+  font-size: 12px; padding: 2px 7px; border-radius: 999px;
+  background: rgba(159,214,176,.16); color: #9fd6b0;
+}
+.qtag.t-gift { background: rgba(255,179,160,.18); color: #ffb3a0; }
+
+/* ---------------------------------------------------------------- toast */
+.toast {
+  position: absolute; left: 50%; top: 250px;
+  transform: translate(-50%, -16px);
+  background: rgba(255, 236, 205, .96);
+  color: #3a2b1a;
+  font-size: 32px; font-weight: 600;
+  padding: 18px 40px; border-radius: 999px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.45);
+  opacity: 0; transition: opacity .3s, transform .3s;
+  white-space: nowrap;
+  z-index: 9;
+}
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ------------------------------------------------------- stamp cover */
+/* Doubao burns a translucent "AI 生成" mark into the bottom-right corner.
+   Cropping would cut the drawing, and scrubbing it out of a pencil-shaded
+   frame is fiddly -- so we simply park a sticky note over that corner. */
+.stamp-cover {
+  position: absolute;
+  right: -10px; bottom: -6px;
+  z-index: 6;
+  width: 268px; height: 112px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  background: linear-gradient(150deg, #fff9e8, #fdf0cf);
+  border: 3px solid #e3cf9f;
+  border-radius: 12px;
+  transform: rotate(-3.2deg);
+  box-shadow: 0 10px 24px rgba(90, 70, 40, .22);
+}
+.stamp-cover::before {
+  content: "";
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(4deg);
+  width: 76px; height: 26px;
+  background: rgba(214, 236, 214, .75);
+  border-left: 1px dashed rgba(150,170,150,.5);
+  border-right: 1px dashed rgba(150,170,150,.5);
+}
+.stamp-title {
+  font-size: 22px; letter-spacing: 6px; color: #b08952;
+}
+.stamp-name {
+  font-size: 30px; font-weight: 700; color: #6b4a22;
+  max-width: 240px; overflow: hidden; white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Temporary build tag, so it is obvious which build is on screen. */
+#build {
+  margin-left: 18px;
+  font-size: 18px; letter-spacing: .04em; color: #a2917a; opacity: .55;
+}

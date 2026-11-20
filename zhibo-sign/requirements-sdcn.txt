@@ -1,0 +1,19 @@
+# 本地扩散出图服务（scripts/sdcn_server.py）专用依赖。
+# 主程序（requirements.txt）不用装这些 —— 两边故意分开，模型挂了不影响直播。
+#
+# 用法（不要在 miniconda 的 base 环境里装：那里 transformers 和 numpy 2.x 冲突）：
+#   python -m venv H:/envs/sdcn
+#   H:/envs/sdcn/Scripts/python.exe -m pip install torch    # 走 PyPI，别用 pytorch 官网索引
+#   H:/envs/sdcn/Scripts/python.exe -m pip install -r requirements-sdcn.txt
+#   python scripts/fetch_models.py                          # 权重走魔搭（约 4.3G）
+#
+diffusers>=0.31
+transformers>=4.44
+accelerate>=0.33
+safetensors
+fastapi
+uvicorn[standard]
+pydantic>=2
+pillow
+numpy
+httpx

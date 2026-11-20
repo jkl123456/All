@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>直播间手写签名</title>
+<link rel="stylesheet" href="/overlay/style.css">
+</head>
+<body>
+<div id="stage">
+  <!-- 底板：原图里的「智纪元」已经被 app/pipeline/plate.py 擦掉了 -->
+  <div class="poster"></div>
+
+  <!-- 豆包出的整张成图（名字已经在里面）。写完那一刻才铺上来，
+       因为框外的像素和底板几乎一样，切换看不出来。 -->
+  <div class="shot" id="shot"></div>
+
+  <!-- 名字写在原来「智纪元」的位置 -->
+  <div class="art" id="art">
+    <canvas id="sand" width="1000" height="420"></canvas>
+    <canvas id="fx" width="1000" height="420"></canvas>
+    <!-- 一支毛笔：笔尖就钉在当前落笔的位置，JS 只改 left/top 和倾角 -->
+    <div class="pen" id="pen">
+      <div class="brush">
+        <div class="shaft"></div>
+        <div class="ferrule"></div>
+        <div class="tuft"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 玩法说明：观众只要打名字，送礼可以插队 -->
+  <div class="hint" id="hint">
+    <b>评论名字即可参与</b>
+    <span>送礼物插队</span>
+  </div>
+
+  <div class="now" id="now">
+    <span class="nick" id="whoNick"></span>
+    <span class="badge" id="whoTier" hidden></span>
+  </div>
+
+  <!-- 祝福语：念的就是这一句，和语音一起出现，写完再淡出 -->
+  <div class="bless" id="bless"><span id="blessText"></span></div>
+
+  <!-- 排队 / 送礼插队：浮在右上角。前 8 行是虚拟队列，真人从第 9 行起；
+       队列更长时中间折一行"…"，队尾单独挂一行（那位的序号就是他的排位）。 -->
+  <div class="queue" id="queue" hidden>
+    <div class="q-head">
+      <b>排队中</b>
+      <span id="qCount">0</span>
+    </div>
+    <div class="q-list" id="qList"></div>
+  </div>
+
+  <!-- 真人出镜小窗：左下角。播放的是后台上传的真人录像，当画中画用。
+       平台判"录播/挂机"的核心是画面里有没有会动的人，字迹动画和海报撑不起来。
+       一律静音：不静音浏览器直接拦掉自动播放（整块是黑的），而且真出声会和
+       祝福语音抢同一路音频。要人声还是得开麦。 -->
+  <div class="cam" id="cam" hidden>
+    <video id="camV" muted playsinline preload="auto"></video>
+  </div>
+
+  <!-- 实时 HUD：秒级跳动的时钟 + 呼吸的红点。
+       抖音判"录播/挂机"看的是画面有没有实时变化：静帧循环是最明显的特征。
+       一个每秒重绘的钟，等于持续告诉机审"这帧是现在算出来的"。
+       位置在左下角；开了真人小窗时 JS 会把 bottom 顶到小窗上方，别被压住。
+       右上给排队面板，中间是字，底部中间是海报自己的标语。 -->
+  <div class="hud" id="hud">
+    <span class="dot"></span>
+    <b id="hudTime">--:--:--</b>
+    <span id="hudDate"></span>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+<script src="/overlay/draw.js"></script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+/* 直播间手写签名 —— 1080x1920 竖屏叠加层。
+ *
+ * 版式：豆包出的整张海报就是直播背景（`.poster` 是擦过字的底板，
+ * 写完那一刻换成 `.shot` 成图），名字写在原来「智纪元」的位置。
+ * 队列、礼物插队、玩法说明都只是浮在图上的一层玻璃片，不占固定条。
+ *
+ * 关键尺寸都来自模板实测（1279x2280 按 1080 宽等比换算）：
+ *   字的包围盒 229,1008 - 1058,1363  ->  193,851 - 893,1151
+ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #0e1f1c;
+  overflow: hidden;
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+#stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 1080px; height: 1920px;
+  transform-origin: center center;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- 海报底 */
+.poster {
+  position: absolute; inset: 0;
+  background: url("/overlay/assets/poster_clean.jpg") center / cover no-repeat;
+}
+
+/* 成图：写完才淡进来，之后整块就是直播画面 */
+.shot {
+  position: absolute; inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity .7s ease;
+  pointer-events: none;
+}
+.shot.on { opacity: 1; }
+
+/* ------------------------------------------------------------ 写字段落 */
+.art {
+  position: absolute; left: 193px; top: 851px;
+  width: 700px; height: 300px;
+}
+
+.art canvas {
+  position: absolute; inset: 0;
+  width: 700px; height: 300px;
+}
+
+/* 毛笔：笔尖（.brush 的底边中点）就钉在落笔点上，
+   绕这个点旋转 --rot、按字框大小缩放 --s、提笔时整体抬起 --lift。 */
+.pen {
+  position: absolute; left: 0; top: 0;
+  width: 0; height: 0;
+  opacity: 0;
+  transition: opacity .16s ease;
+  pointer-events: none;
+  z-index: 6;
+}
+.pen.on { opacity: 1; }
+
+/* 笔尖落在纸上的一小片影子 */
+.pen::after {
+  content: '';
+  position: absolute; left: -11px; top: -4px;
+  width: 22px; height: 9px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(6, 40, 34, .38), rgba(6, 40, 34, 0));
+}
+
+.brush {
+  position: absolute; left: 0; bottom: 0;
+  width: 34px; height: 210px;
+  margin-left: -17px;
+  transform-origin: 50% 100%;
+  transform: translateY(calc(var(--lift, 0) * -16px))
+             rotate(var(--rot, 32deg))
+             scale(var(--s, 1));
+  transition: transform .11s linear;
+  filter: drop-shadow(3px 8px 8px rgba(20, 40, 34, .22));
+}
+
+/* 笔杆：竹木色，中间提亮当高光 */
+.brush .shaft {
+  position: absolute; left: 9px; top: 0;
+  width: 16px; height: 134px;
+  border-radius: 8px 8px 3px 3px;
+  background: linear-gradient(90deg,
+    #5d3a1c 0%, #97653a 22%, #efd0a0 46%, #b5804a 68%, #5d3a1c 100%);
+}
+.brush .shaft::after {          /* 笔杆顶端的一道收口 */
+  content: '';
+  position: absolute; left: 3px; right: 3px; top: 0;
+  height: 9px; border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #3f2511, rgba(63, 37, 17, 0));
+}
+
+/* 笔斗：连接笔杆和笔毫的那段硬木 */
+.brush .ferrule {
+  position: absolute; left: 5px; top: 127px;
+  width: 24px; height: 22px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #4e2d16 0%, #7c4c28 40%, #2b190c 100%);
+}
+
+/* 笔毫：上宽下尖，越靠笔锋越黑（墨都聚在锋上） */
+.brush .tuft {
+  position: absolute; left: 5px; top: 147px;
+  width: 24px; height: 63px;
+  background:
+    linear-gradient(180deg, rgba(255, 246, 226, .28) 0%, rgba(255, 246, 226, 0) 38%),
+    radial-gradient(140% 90% at 34% 6%, #6b5a48 0%, #33261c 32%, #150d08 70%, #060403 100%);
+  clip-path: polygon(0% 0%, 100% 0%, 68% 66%, 50% 100%, 32% 66%);
+}
+
+/* ------------------------------------------------------------ 玩法说明 */
+/* 浮在海鸥下方那块空白上：浅底 + 毛玻璃，不抢海报的字 */
+.hint {
+  z-index: 9;
+  position: absolute; left: 50%; top: 706px;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 16px;
+  padding: 13px 32px; border-radius: 999px;
+  background: rgba(255, 255, 255, .5);
+  border: 1px solid rgba(255, 255, 255, .68);
+  box-shadow: 0 10px 26px rgba(12, 60, 50, .12);
+  backdrop-filter: blur(7px);
+  white-space: nowrap;
+}
+.hint b {
+  font-size: 27px; font-weight: 600; letter-spacing: .03em;
+  color: #12564a;
+}
+.hint span {
+  font-size: 19px; letter-spacing: .06em;
+  color: rgba(20, 86, 74, .58);
+}
+
+/* ------------------------------------------------------------ 正在写谁 */
+.now {
+  z-index: 9;
+  position: absolute; left: 193px; top: 1168px; width: 700px;
+  height: 56px;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+}
+.now .nick {
+  font-size: 30px; letter-spacing: .04em;
+  color: rgba(18, 72, 60, .78);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+}
+.now .badge {
+  font-size: 20px; letter-spacing: .1em;
+  padding: 4px 12px; border-radius: 999px;
+  color: #8a5a12;
+  background: rgba(255, 233, 176, .82);
+  border: 1px solid rgba(186, 138, 52, .45);
+}
+
+/* ------------------------------------------------------------ 祝福语 */
+/* 位置是量过的：字框在 851~1151（字身实际从 ~925 起），玩法说明到 ~761 结束，
+ * 中间这一条是空白的。不能挂在名字下面——那一条正好压着海报上的
+ * 「全力以赴 未来可期」（y≈1306）。
+ * 一句祝福 16~26 字，30px 一行放得下，所以不换行，居中就好。
+ * 只用 2px 贴身投影：大半径白色辉光会把字本身糊掉（CEF 下尤其明显）。 */
+.bless {
+  z-index: 9;
+  position: absolute; left: 50%; top: 818px;
+  transform: translateX(-50%);
+  width: 940px;
+  display: flex; justify-content: center;
+  opacity: 0;
+  transition: opacity .5s ease;
+  pointer-events: none;
+}
+.bless.on { opacity: 1; }
+.bless span {
+  font-size: 30px; font-weight: 500; line-height: 1.4; letter-spacing: .05em;
+  white-space: nowrap;
+  color: #0b4c40;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, .9);
+}
+
+/* ---------------------------------------------------------------- 排队 */
+/* 右上角悬浮，竖着排最近 5 位。这一块是海报上唯一干净的深绿空域
+ * （海报的说明字在 y≈390 那条线上，面板卡在它上面不会压到字）。 */
+.queue {
+  z-index: 9;
+  position: absolute; top: 28px; right: 40px; width: 330px;
+  display: flex; flex-direction: column; gap: 7px;
+  pointer-events: none;
+}
+.queue[hidden] { display: none; }
+
+.q-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 8px 0 12px;
+}
+.q-head b {
+  font-size: 19px; font-weight: 600; letter-spacing: .16em;
+  color: rgba(240, 251, 245, .74);
+  text-shadow: 0 1px 3px rgba(2, 26, 20, .4);
+}
+.q-head span {
+  font-size: 19px; font-variant-numeric: tabular-nums;
+  color: rgba(240, 251, 245, .56);
+}
+
+.q-list { display: flex; flex-direction: column; gap: 7px; }
+
+/* 折行：队列比面板长时中间的"…"，虚线框+居中，一眼看出这不是一个人 */
+.q-row.more {
+  justify-content: center; gap: 8px;
+  background: rgba(6, 40, 34, .24);
+  border-style: dashed; border-color: rgba(255, 255, 255, .2);
+  box-shadow: none;
+}
+.q-row.more .q-no {
+  width: auto; height: 22px; padding: 0 9px; border-radius: 11px;
+  font-size: 13px; letter-spacing: .1em;
+}
+.q-row.more .q-nm { flex: 0 0 auto; font-size: 18px; color: rgba(228, 246, 237, .7); }
+
+/* 队尾：刚打完名字的那位，序号就是他自己的排位 */
+.q-row.tail { border-color: rgba(255, 226, 152, .5); }
+.q-row.tail .q-tag { color: rgba(255, 226, 152, .82); }
+
+.q-row {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 13px 7px 9px; border-radius: 14px;
+  background: rgba(6, 40, 34, .5);
+  border: 1px solid rgba(255, 255, 255, .16);
+  box-shadow: 0 8px 20px rgba(3, 26, 20, .2);
+  backdrop-filter: blur(7px);
+  animation: qIn .26s ease both;
+}
+@keyframes qIn {
+  from { opacity: 0; transform: translateX(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 序号：一位数就一个圆点，排队顺序一眼能数 */
+.q-no {
+  flex: 0 0 auto;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; line-height: 1; font-variant-numeric: tabular-nums;
+  color: rgba(236, 250, 243, .9);
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .16);
+}
+
+.q-nm {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 23px; line-height: 1.2; color: #f2faf5;
+  text-shadow: 0 1px 2px rgba(0, 22, 16, .4);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.q-tag {
+  flex: 0 0 auto;
+  font-size: 14px; letter-spacing: .04em;
+  color: rgba(228, 246, 237, .5);
+}
+
+/* 送礼插队：金片，一眼和人名区分开 */
+.q-row.gift {
+  background: linear-gradient(180deg, rgba(255, 234, 176, .96), rgba(246, 206, 120, .93));
+  border-color: rgba(255, 244, 208, .9);
+  box-shadow: 0 8px 20px rgba(112, 76, 10, .26), 0 0 0 4px rgba(255, 226, 152, .16);
+}
+.q-row.gift .q-no {
+  color: #4a3406;
+  background: rgba(255, 255, 255, .42);
+  border-color: rgba(120, 84, 16, .24);
+}
+.q-row.gift .q-nm { color: #43300a; text-shadow: none; }
+.q-row.gift .q-tag { color: rgba(72, 50, 8, .66); }
+
+/* 正在写：金边但不是满金片，和送礼插队分得开 */
+.q-row.writing {
+  border-color: rgba(255, 226, 152, .6);
+  box-shadow: 0 8px 22px rgba(3, 26, 20, .24), inset 0 0 0 1px rgba(255, 226, 152, .14);
+}
+.q-row.writing .q-tag { color: #ffd88c; }
+/* 出字中：还没轮到，稍微压暗一点 */
+.q-row.gen { opacity: .8; }
+.q-row.gen .q-tag { color: rgba(255, 226, 152, .78); }
+
+/* ------------------------------------------------------------ 真人小窗 */
+/* 右下角画中画（后台可以改回左下）。尺寸由 JS 按视频真实比例在 maxW×maxH 内接算出来，
+ * 所以这里只给一个初始值兜底——竖屏视频写成 300×340 就是最坏情况。
+ * z-index 比 HUD 低：时钟永远压在小窗之上，不能被遮住。 */
+.cam {
+  z-index: 7;
+  position: absolute; right: 40px; bottom: 58px;
+  width: 300px; height: 340px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #06110e;
+  border: 3px solid rgba(255, 255, 255, .42);
+  box-shadow: 0 18px 40px rgba(4, 26, 20, .34);
+  transition: opacity .4s ease;
+}
+.cam[hidden] { display: none; }
+.cam video {
+  display: block; width: 100%; height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+}
+/* 自拍要翻转：不然画面里是反的，观众一眼看出不对劲 */
+.cam.mirror video { transform: scaleX(-1); }
+
+/* 底边一条极淡的压暗，让小窗和海报之间有过渡，不像硬贴上去的 */
+.cam::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0; height: 34%;
+  background: linear-gradient(180deg, rgba(3, 22, 17, 0), rgba(3, 22, 17, .32));
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- 实时 HUD */
+/* 右下角：红点 + 秒级时钟。存在意义不是好看，是让画面**每秒都有像素在变**。
+ * 只放时间不放"在线人数"——人数是编的，编错了反而更假。
+ * 默认跟在真人小窗同一边（右下）；小窗显示时 JS 会把它顶到小窗上方。
+ * 这里的 58px 只是没有小窗时的默认底边距。 */
+.hud {
+  z-index: 9;
+  position: absolute; right: 40px; bottom: 58px;
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 20px 9px 16px; border-radius: 999px;
+  background: rgba(6, 40, 34, .42);
+  border: 1px solid rgba(255, 255, 255, .16);
+  backdrop-filter: blur(7px);
+  pointer-events: none;
+  /* 这里故意**不加** transition：小窗出现时时钟要整体跳到上方，
+     过渡动画在虚拟时间 / 窗口不可见的场景下可能停在起始帧，
+     结果就是时钟永远压在小窗里面。跳一下比错位好。 */
+}
+.hud .dot {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: #ff5252; box-shadow: 0 0 10px rgba(255, 82, 82, .8);
+  animation: hudPulse 1.6s ease-in-out infinite;
+}
+@keyframes hudPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .35; transform: scale(.82); }
+}
+.hud b {
+  font-size: 26px; font-weight: 600; line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: .04em;
+  color: #f4fbf7; text-shadow: 0 1px 3px rgba(0, 22, 16, .55);
+}
+.hud span:last-child {
+  font-size: 17px; letter-spacing: .04em;
+  color: rgba(238, 250, 244, .72);
+}
+
+/* ---------------------------------------------------------------- toast */
+.toast {
+  z-index: 10;
+  position: absolute; left: 50%; top: 236px;
+  transform: translate(-50%, -8px);
+  padding: 12px 26px; border-radius: 999px;
+  background: rgba(12, 44, 38, .82);
+  color: #f3f7f2; font-size: 26px; letter-spacing: .06em;
+  opacity: 0; transition: opacity .25s, transform .25s;
+  white-space: nowrap;
+}
+.toast.on { opacity: 1; transform: translate(-50%, 0); }

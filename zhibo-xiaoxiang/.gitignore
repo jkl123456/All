@@ -1,0 +1,16 @@
+# 真实配置含密钥/Cookie/房间号，不入库；仓库只保留脱敏模板
+config.yaml
+
+# 浏览器登录态（含 Cookie / 历史 / 本地存储），体积大且敏感
+.chrome-doubao/
+.chrome-douyin/
+
+# 运行时产物：头像、截图、缓存、虚拟素材等
+data/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+
+# 本地工作区数据
+.workbuddy/

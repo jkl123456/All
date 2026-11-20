@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+httpx
+opencv-python-headless
+numpy
+pyyaml
+websockets
+Pillow
+edge-tts

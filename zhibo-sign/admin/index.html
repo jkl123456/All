@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>签名后台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #14100c; color: #f2e7d6; min-height: 100vh;
+  font: 15px/1.6 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 26px 22px 60px; }
+header { display: flex; align-items: center; justify-content: space-between;
+         gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+h1 { font-size: 21px; letter-spacing: .04em; }
+h1 small { color: #a08e77; font-weight: 400; margin-left: 10px; font-size: 13px; }
+.top-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+button {
+  font: inherit; padding: 8px 16px; border-radius: 9px; cursor: pointer;
+  background: #241d16; color: #e8dac5; border: 1px solid #3a2f24;
+  transition: .15s;
+}
+button:hover { background: #2f261d; border-color: #4d3f2f; }
+button.warn { border-color: #5a3630; color: #f0b8ad; }
+button.gold { background: linear-gradient(180deg, #ffe1a2, #f2bf62);
+              color: #3a2a12; font-weight: 700; border: 0; }
+.cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+.card {
+  background: #1b1611; border: 1px solid #2c241b; border-radius: 13px;
+  padding: 14px 16px;
+}
+.card .k { font-size: 12px; color: #a08e77; letter-spacing: .08em; }
+.card .v { font-size: 26px; font-weight: 700; margin-top: 4px; color: #ffe7c4; }
+.grid { display: grid; grid-template-columns: 1fr 330px; gap: 16px; align-items: start; }
+.panel {
+  background: #1b1611; border: 1px solid #2c241b; border-radius: 13px;
+  padding: 16px 18px;
+}
+.panel h2 { font-size: 14px; color: #cbb79b; letter-spacing: .1em;
+            font-weight: 600; margin-bottom: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid #241e17; }
+th { font-size: 12px; color: #8d7c67; font-weight: 500; letter-spacing: .08em; }
+td { font-size: 14px; }
+.nm { font-size: 17px; color: #fff3e0; letter-spacing: .06em; }
+.tagn { font-size: 11px; padding: 2px 8px; border-radius: 99px;
+        background: #2a2219; color: #b7a48c; }
+.tagn.gift { background: linear-gradient(180deg, #ffe1a2, #f2bf62); color: #3a2a12;
+             font-weight: 700; }
+td .mini { font-size: 12px; padding: 4px 10px; border-radius: 7px; }
+.empty { color: #6f6152; padding: 18px 4px; font-size: 14px; }
+.field { display: flex; gap: 8px; margin-bottom: 9px; }
+.field input, .field select {
+  font: inherit; padding: 8px 11px; border-radius: 9px; width: 100%;
+  background: #120e0a; border: 1px solid #32291f; color: #f2e7d6;
+}
+.field input::placeholder { color: #6a5c4c; }
+.logs {
+  font: 12.5px/1.75 ui-monospace, Consolas, monospace;
+  color: #a89a86; max-height: 380px; overflow: auto;
+  white-space: pre-wrap; word-break: break-all;
+}
+.logs div { border-bottom: 1px solid #201a14; padding: 2px 0; }
+.hint { font-size: 12px; color: #7e7060; margin-top: 10px; line-height: 1.7; }
+.remembered { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.remembered span { font-size: 12px; background: #241d16; border: 1px solid #33291f;
+                   padding: 3px 9px; border-radius: 99px; color: #c9b79e; }
+a { color: #ffd47a; }
+
+/* 虚拟循环素材 */
+.libbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.libbar input {
+  font: inherit; padding: 8px 11px; border-radius: 9px; width: 220px;
+  background: #120e0a; border: 1px solid #32291f; color: #f2e7d6;
+}
+.libbar input::placeholder { color: #6a5c4c; }
+.libgrid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
+  max-height: 430px; overflow: auto;
+}
+.libcell {
+  position: relative; border: 1px solid #2c241b; border-radius: 10px;
+  overflow: hidden; background: #120e0a;
+}
+.libcell img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+.libcell .nm {
+  font-size: 11.5px; padding: 3px 7px; color: #c9b79e;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.libcell .del {
+  position: absolute; top: 5px; right: 5px; width: 24px; height: 24px;
+  padding: 0; line-height: 1; border-radius: 99px; font-size: 15px;
+  background: rgba(18, 14, 10, .78); border: 1px solid #4a3a2a; color: #f0b8ad;
+}
+.libcell .del:hover { background: #5a3630; }
+.libempty { color: #6f6152; font-size: 13px; padding: 10px 2px; }
+@media (max-width: 900px) { .libgrid { grid-template-columns: repeat(3, 1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>签名后台 <small id="cfgline"></small></h1>
+    <div id="modline" style="font-size:12px;color:#8d7c67;margin:-6px 0 10px;letter-spacing:.04em"></div>
+    <div class="top-actions">
+      <button onclick="act('pause')">暂停接单</button>
+      <button onclick="act('resume')">继续</button>
+      <button onclick="act('skip')">跳过当前</button>
+      <button class="warn" onclick="act('clear')">清空队列</button>
+      <button onclick="act('virtual_on')">虚拟开</button>
+      <button onclick="act('virtual_off')">虚拟关</button>
+      <a href="/" target="_blank"><button class="gold">直播画面</button></a>
+    </div>
+  </header>
+
+  <div class="cards">
+    <div class="card"><div class="k">排队中</div><div class="v" id="cQueue">0</div></div>
+    <div class="card"><div class="k">正在写</div><div class="v" id="cCur">—</div></div>
+    <div class="card"><div class="k">已完成</div><div class="v" id="cDone">0</div></div>
+    <div class="card"><div class="k">记住的名字</div><div class="v" id="cNames">0</div></div>
+    <div class="card"><div class="k">观看端</div><div class="v" id="cOv">0</div></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <section class="panel">
+        <h2>全部排队</h2>
+        <table>
+          <thead><tr><th>#</th><th>要写的名字</th><th>昵称</th><th>来源</th><th>等待</th><th></th></tr></thead>
+          <tbody id="rows"><tr><td colspan="6" class="empty">队列是空的</td></tr></tbody>
+        </table>
+      </section>
+
+      <section class="panel" style="margin-top:16px">
+        <h2>运行日志</h2>
+        <div class="logs" id="logs"></div>
+      </section>
+    </div>
+
+    <aside>
+      <section class="panel">
+        <h2>手动加一单</h2>
+        <div class="field"><input id="inNick" placeholder="昵称（谁要的）"></div>
+        <div class="field"><input id="inName" placeholder="要写的名字，如 张三"></div>
+        <div class="field">
+          <select id="inTier">
+            <option value="0">素签（弹幕档）</option>
+            <option value="1">礼签（¥1 起）</option>
+            <option value="30">尊签（¥30 起）</option>
+          </select>
+        </div>
+        <div class="field"><button class="gold" style="width:100%" onclick="addOrder()">加入队列</button></div>
+        <div class="hint">手动单直接进队尾，用来试画面。</div>
+      </section>
+
+      <section class="panel" style="margin-top:16px">
+        <h2>记住的 昵称 → 名字</h2>
+        <div class="remembered" id="remembered"><span>暂无</span></div>
+        <div class="hint">
+          观众发弹幕说了名字，这里记下来。他之后送礼插队时，写的就是这个名字，
+          而不是他的抖音昵称。
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <section class="panel" style="margin-top:16px">
+    <h2>直播背景 <small id="bgNow" style="color:#8d7c67;font-weight:400"></small></h2>
+    <div class="libbar">
+      <img id="bgThumb" alt="当前背景"
+           style="width:126px;height:224px;object-fit:cover;border-radius:6px;border:1px solid #3a2f25">
+      <button class="gold" onclick="document.getElementById('bgFile2').click()">存进背景库</button>
+      <input type="file" id="bgFile2" accept="image/*" hidden onchange="uploadBgLib(this)">
+      <button onclick="document.getElementById('bgFile').click()">上传并直接换上</button>
+      <input type="file" id="bgFile" accept="image/*" hidden onchange="uploadBg(this)">
+      <label style="display:flex;align-items:center;gap:6px;color:#c9b79f;font-size:13px">
+        <input type="checkbox" id="bgErase"> 擦掉原图上的字
+      </label>
+      <input id="bgBox" style="width:186px" placeholder="x0,y0,x1,y1">
+      <button onclick="resetBg()">恢复上一张</button>
+    </div>
+    <div class="libbar" style="margin-bottom:10px">
+      <label style="display:flex;align-items:center;gap:6px;color:#c9b79f;font-size:13px">
+        <input type="checkbox" id="bgRotOn" onchange="saveBgRot()"> 自动轮换
+      </label>
+      <span style="color:#c9b79f;font-size:13px">每写完</span>
+      <input id="bgEvery" style="width:58px" value="6" onchange="saveBgRot()">
+      <span style="color:#c9b79f;font-size:13px">个名字换一张（只在空场换）</span>
+      <span id="bgRotNow" style="color:#8d7c67;font-size:12.5px"></span>
+    </div>
+    <div class="libgrid" id="bgLib"></div>
+    <div class="hint">
+      上传后 <b>立刻生效</b>，OBS 里的画面自己会换，不用重启。<br>
+      背景会被统一成 <b>1080×1920</b>（等比放大后居中裁切）——写字的位置是按这个尺寸算死的，
+      尺寸不对字就会写偏。<br>
+      「擦掉原图上的字」只对<b>同一套模板</b>有用：默认擦中间「智纪元」那块（框可以自己填）。
+      新背景本来就干净就别勾，勾了会在中间抹一条渐变。
+    </div>
+    <div class="hint" style="color:#c99a8e">
+      库里的背景<b>必须是同一版式</b>：字位固定在 193,851 - 893,1148。换色、换纹理、换四周装饰都行，
+      版式不同字就写到别处去了。轮换后素材库里已有的成图（data/signatures）仍是旧背景，
+      空场回放时会闪一下——系统会自动清掉合成缓存，但旧素材本身的底图不会变。
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <h2>真人出镜小窗 <small id="camNow" style="color:#8d7c67;font-weight:400"></small></h2>
+    <div class="libbar">
+      <button class="gold" onclick="document.getElementById('camFile').click()">上传真人视频</button>
+      <input type="file" id="camFile" accept="video/mp4,video/webm,video/quicktime"
+             hidden onchange="uploadCam(this)">
+      <label style="display:flex;align-items:center;gap:6px;color:#c9b79f;font-size:13px">
+        <input type="checkbox" id="camOn" onchange="saveCamOpt()"> 显示
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;color:#c9b79f;font-size:13px">
+        <input type="checkbox" id="camMirror" onchange="saveCamOpt()"> 左右翻转（自拍）
+      </label>
+      <select id="camPos" style="width:120px" onchange="saveCamOpt()">
+        <option value="br">右下角</option>
+        <option value="bl">左下角</option>
+      </select>
+      <button onclick="fixCam()" title="把 HEVC 等浏览器解不了的段转成 H.264">转码旧视频</button>
+    </div>
+    <div class="libbar" style="margin-bottom:10px">
+      <span style="color:#c9b79f;font-size:13px">最大宽</span>
+      <input id="camW" style="width:70px" value="440" onchange="saveCamOpt()">
+      <span style="color:#c9b79f;font-size:13px">高</span>
+      <input id="camH" style="width:70px" value="340" onchange="saveCamOpt()">
+      <span style="color:#c9b79f;font-size:13px">圆角</span>
+      <input id="camK" style="width:62px" value="26" onchange="saveCamOpt()">
+      <span style="color:#c9b79f;font-size:13px">边距 x / y</span>
+      <input id="camX" style="width:58px" value="40" onchange="saveCamOpt()">
+      <input id="camY" style="width:58px" value="58" onchange="saveCamOpt()">
+    </div>
+    <div class="libgrid" id="camLib"></div>
+    <div class="hint">
+      传<b>你本人</b>的录像（自拍、手部、侧脸都行），会以画中画贴在画面<b>右下角</b>（可切左下），
+      时钟自动让到它上方。上传后<b>立刻生效</b>，画面窗口不用刷新。<br>
+      视频一律<b>静音</b>播放——浏览器只给静音视频自动播放的许可，不静音整块是黑的；
+      要人声还是得开麦。这是代码这一侧能做到的极限。<br>
+      建议 5~20 秒、720p 以内、mp4（H.264）最稳。<b>多传几段不同角度 / 不同动作，
+      轮着播</b>：同一段反复循环本身就是"周期性重复"，和整屏循环是同一个毛病。<br>
+      「最大宽 / 高」是外框上限，实际尺寸按视频比例内接。右下角那块只有 <b>340 高</b>
+      的干净地（再高会压到"心有山海 静而不争"），调大之前先看画面。
+    </div>
+    <div class="hint" style="color:#c99a8e">
+      这只是<b>辅助</b>。平台判「录播 / 挂机」真正看的是有没有真人实时参与：
+      开麦隔几分钟说一句 &gt; 画面里有张会动的脸 &gt; 时钟和小窗。三者叠加才稳，
+      单独靠一段循环视频仍然会被提醒。
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <h2>签名样式 <small id="styleNow" style="color:#8d7c67;font-weight:400"></small></h2>
+    <div class="libbar">
+      <select id="selFont" style="width:280px" onchange="saveStyle()"></select>
+      <select id="selStyle" style="width:200px" onchange="saveStyle()"></select>
+      <span class="libempty" style="padding:0">
+        换完**下一单**就变，不用重启 · 同时写回 config.yaml，重开还在
+      </span>
+    </div>
+    <div class="hint">
+      字形决定"像不像手写"：马善政最有笔锋，站酷黄油配立体挤出最像 3D。
+      材质里 <b>墨绿平涂</b> 最稳、<b>烫金</b> 最贵气、<b>立体挤出</b> 最有厚度。
+      注意：local 兜底那条路（骨架提笔画）只认楷体，行书的连笔提不出笔顺——
+      但 sdcn 挂了退回 local 时也不会报错，只是字会变成楷体版。
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <h2>祝福语音 <small id="voiceNow" style="color:#8d7c67;font-weight:400"></small></h2>
+    <div class="libbar">
+      <label style="display:flex;align-items:center;gap:6px;color:#c9b79f;font-size:13px">
+        <input type="checkbox" id="vcOn" onchange="saveVoice()"> 开
+      </label>
+      <select id="selVoice" style="width:250px" onchange="saveVoice()"></select>
+      <select id="selRate" style="width:120px" onchange="saveVoice()">
+        <option value="+0%">正常语速</option>
+        <option value="+8%">稍快</option>
+        <option value="+15%">快</option>
+        <option value="-10%">慢</option>
+      </select>
+      <select id="selSource" style="width:175px" onchange="saveVoice()">
+        <option value="ai">文案：AI 现写</option>
+        <option value="template">文案：模板库</option>
+      </select>
+      <input id="vcName" style="width:110px" placeholder="试听名字" value="张三">
+      <button onclick="previewVoice()">试听</button>
+    </div>
+    <div class="hint">
+      每写一个名字配一句专属祝福：和运笔同时开口，写完那一刻收声，字幕挂在名字下面。<br>
+      「AI 现写」约 1~2 秒（在出图那一批里并发做掉，不占播出时间），调不通自动退回模板；
+      <b>同一个名字永远同一句</b>——文案和 mp3 都按名字缓存，重播不联网、不花钱。<br>
+      话比字长时会把运笔拖慢（不多于 20 秒），保证"说完"和"写完"几乎同时。<br>
+      OBS 里要在浏览器源属性勾 <b>控制音频</b>，否则这里播了也不进直播混音。
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <h2>直播间 <small id="liveState" style="color:#8d7c67;font-weight:400"></small></h2>
+    <div class="libbar">
+      <input id="liveRoom" style="width:520px"
+             placeholder="粘贴直播间地址，如 https://live.douyin.com/YOUR_ROOM_ID?camera_id=0"
+             onkeydown="if(event.key==='Enter')saveLive()">
+      <button class="gold" onclick="saveLive()">保存并切换</button>
+      <span class="libempty" style="padding:0">
+        每次开播房间号都会变 · 采集器在线时点一下当场切，不在线就先存着，下次启动生效
+      </span>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <h2>图片管理 <small id="libCount" style="color:#8d7c67;font-weight:400"></small></h2>
+    <div class="libbar">
+      <input id="libName" placeholder="名字（留空就用文件名）">
+      <button class="gold" onclick="document.getElementById('libFile').click()">上传图片</button>
+      <input type="file" id="libFile" accept="image/*" multiple hidden onchange="uploadLib(this)">
+      <span class="libempty" style="padding:0">
+        这些就是空场循环播的成图 · 整张海报或白底字都认，会自动抠出笔迹
+      </span>
+    </div>
+    <div class="libbar" style="margin-top:10px;border-top:1px solid #2a231c;padding-top:10px">
+      <input id="genCount" type="number" value="20" min="1" max="60" style="width:84px" title="生成多少张">
+      <button class="gold" id="genBtn" onclick="genLibrary()">按当前样式生成空场素材</button>
+      <span class="libempty" id="genState" style="padding:0">
+        素材库空了的话，空场会退到"本地楷体起头"——和上面选的字体/材质不一致。点这里按
+        马善政 + 烫金 批量补回来（每张 2~3 秒，后台跑）
+      </span>
+    </div>
+    <div class="libgrid" id="libGrid"></div>
+  </section>
+</div>
+
+<script>
+let lastRender = '';
+
+async function act(action, extra) {
+  const body = Object.assign({ action }, extra || {});
+  const r = await fetch('/api/admin/action', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) alert(d.error || '操作失败');
+  else render(d);
+}
+
+async function addOrder() {
+  const nickname = document.getElementById('inNick').value.trim() || '手动';
+  const name = document.getElementById('inName').value.trim();
+  const value = parseFloat(document.getElementById('inTier').value) || 0;
+  if (!name) { alert('请填要写的名字'); return; }
+  const r = await fetch('/api/admin/action', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ action: 'add', nickname, name, value }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '加单失败'); return; }
+  document.getElementById('inName').value = '';
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function render(d) {
+  // panel = 正在写 + 出字中 + 排队，和直播画面右上角是同一份数据
+  const list = d.panel || d.queue || [];
+  document.getElementById('cQueue').textContent = list.length;
+  document.getElementById('cCur').textContent =
+    d.current ? d.current.name : '—';
+  document.getElementById('cDone').textContent = d.done || 0;
+  document.getElementById('cNames').textContent = Object.keys(d.remembered || {}).length;
+  document.getElementById('cOv').textContent = d.overlays || 0;
+
+  const rows = list.map((o, i) => {
+    const tag = o.state === 'writing' ? '正在写'
+              : o.state === 'gen' ? '出字中'
+              : (o.jump ? esc(o.gift || '礼物') : '弹幕');
+    const cls = o.jump ? 'gift' : '';
+    const pin = o.state === 'queue'
+      ? `<button class="mini" onclick="act('bump',{seq:${o.seq}})">置顶</button>` : '';
+    return `
+    <tr>
+      <td>${i + 1}</td>
+      <td class="nm">${esc(o.name)}</td>
+      <td>${esc(o.nickname)}</td>
+      <td><span class="tagn ${cls}">${tag}</span></td>
+      <td>${o.waited}s</td>
+      <td>
+        ${pin}
+        <button class="mini" onclick="act('drop',{seq:${o.seq}})">移除</button>
+      </td>
+    </tr>`;
+  }).join('');
+  const sig = rows + '|' + (d.logs || []).join('\n') + '|' + JSON.stringify(d.remembered);
+  if (sig === lastRender) return;
+  lastRender = sig;
+
+  document.getElementById('rows').innerHTML =
+    rows || '<tr><td colspan="6" class="empty">队列是空的</td></tr>';
+  document.getElementById('logs').innerHTML =
+    (d.logs || []).slice().reverse().map(l => `<div>${esc(l)}</div>`).join('')
+    || '<div>（暂无日志）</div>';
+
+  const rem = Object.entries(d.remembered || {}).slice(-14);
+  document.getElementById('remembered').innerHTML =
+    rem.length ? rem.map(([k, v]) => `<span>${esc(k)} → ${esc(v)}</span>`).join('')
+               : '<span>暂无</span>';
+}
+
+function renderCfg(d) {
+  const c = d.config || {};
+  document.getElementById('cfgline').textContent =
+    `provider=${c.provider} · 前缀=${c.prefix || '无'} · 队列上限=${c.max}`;
+  renderGen(d.libgen || {});
+  // 名字审核的状态挂在这一行下面：调没调、拦了几个、有没有报错（报错多说明 Key/网络有问题）
+  const md = d.moderation || {};
+  const el = document.getElementById('modline');
+  if (el) {
+    el.textContent = md.enabled
+      ? `审核：${md.model} · 已问 ${md.calls} 次 · 拦截 ${md.blocked} · 失败 ${md.errors}`
+        + (md.fail_open ? ' · 失败放行' : ' · 失败拦截')
+      : '审核：已关闭';
+    el.style.color = (md.errors && md.errors > 3) ? '#f0b8ad' : '#8d7c67';
+  }
+}
+
+let libSig = '';
+
+// ---------------- 直播间 ----------------
+let liveLoaded = false;
+async function loadLive() {
+  const r = await fetch('/api/live').catch(() => null);
+  if (!r || !r.ok) return;
+  const d = await r.json().catch(() => null);
+  if (!d || !d.ok) return;
+  const box = document.getElementById('liveRoom');
+  // 只在第一次进来/后端房间变了时回填，别每 6 秒把正在编辑的内容冲掉
+  if (!liveLoaded || (document.activeElement !== box && d.room && box.dataset.room !== d.room)) {
+    box.value = d.url || d.room || '';
+    box.dataset.room = d.room || '';
+    liveLoaded = true;
+  }
+  const bridge = d.bridge
+    ? `<span style="color:#8fe0a8">采集器在线</span>${d.bridge_room && d.bridge_room !== d.room ? `（当前实际在 ${esc(d.bridge_room)}）` : ''}`
+    : d.bridge_old
+      ? '<span style="color:#e8c17a">采集器在线但版本旧（没有控制口）——重启一次采集器才能当场切</span>'
+      : '<span style="color:#e0b08f">采集器未连接</span>';
+  document.getElementById('liveState').innerHTML =
+    `· 当前 ${esc(d.room || '未设置')} · ${bridge}` +
+    (d.frames != null ? ` · 收到 ${d.frames} 帧 / ${d.events} 条事件` : '');
+}
+
+/* 一键生成空场素材：后端在后台跑，这里只显示进度 */
+function renderGen(g) {
+  const el = document.getElementById('genState');
+  const btn = document.getElementById('genBtn');
+  if (!el || !btn) return;
+  if (g.running) {
+    btn.disabled = true;
+    btn.textContent = '生成中…';
+    el.textContent = `${g.done}/${g.total}（正在写「${g.name || ''}」，失败 ${g.failed || 0}）`;
+    el.style.color = '#ffe7c4';
+  } else {
+    btn.disabled = false;
+    btn.textContent = '按当前样式生成空场素材';
+    if (g.total) {
+      el.textContent = `上一批：${g.total - (g.failed || 0)} 张成功 / ${g.failed || 0} 张失败`;
+      el.style.color = '#8d7c67';
+    }
+  }
+}
+
+async function genLibrary() {
+  const n = parseInt(document.getElementById('genCount').value, 10) || 20;
+  if (!confirm(`用当前的字体 + 材质生成 ${n} 张空场素材？\n每张约 2~3 秒，在后台跑，期间可以正常直播。`))
+    return;
+  const r = await fetch('/api/library/generate', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ count: n }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '启动失败'); return; }
+  renderGen({ running: true, done: 0, total: d.started, failed: 0, name: '' });
+}
+
+/* 直播背景：上传即换。后端把图统一成 1080x1920，并广播 background 事件让 overlay 换图，
+   所以这里不用管刷新——OBS 那边自己会变。 */
+async function loadBg() {
+  const box = document.getElementById('bgBox');
+  let d;
+  try {
+    d = await (await fetch('/api/background')).json();
+  } catch (e) { return; }
+  if (!d || !d.ok) return;
+  document.getElementById('bgThumb').src = d.url;
+  if (box && !box.value && d.box) box.value = d.box.join(',');
+  document.getElementById('bgNow').textContent =
+    `${d.size[0]}×${d.size[1]} · 已是 ${d.stage[0]}×${d.stage[1]} 画布`;
+  loadBgLib();
+}
+
+async function uploadBg(inp) {
+  const f = inp.files && inp.files[0];
+  if (!f) return;
+  const erase = document.getElementById('bgErase').checked;
+  const box = document.getElementById('bgBox').value.trim();
+  if (!confirm(erase
+        ? '上传并擦掉原图中间的字？\n（只对同一套模板合适，框可以在左边改）'
+        : '直接用这张图当背景？\n（背景本来就干净就选这个）')) {
+    inp.value = '';
+    return;
+  }
+  const q = new URLSearchParams({ erase: erase ? '1' : '0' });
+  if (erase && box) q.set('box', box);
+  const btn = inp.previousElementSibling;
+  const old = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '处理中…'; }
+  try {
+    const r = await fetch('/api/background?' + q.toString(), {
+      method: 'POST',
+      headers: { 'content-type': 'application/octet-stream' },
+      body: f,
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!d.ok) { alert(d.error || '上传失败'); return; }
+    loadBg();
+  } catch (e) {
+    alert('上传失败：' + e);
+  } finally {
+    inp.value = '';
+    if (btn) { btn.disabled = false; btn.textContent = old || '上传新背景'; }
+  }
+}
+
+async function resetBg() {
+  if (!confirm('恢复成上一张背景？')) return;
+  const r = await fetch('/api/background/reset', { method: 'POST' });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '没有备份可恢复'); return; }
+  loadBg();
+}
+
+/* ------------------------------------------------------------ 背景库
+   一场直播一直铺同一张海报，画面就是"一圈一圈重复"，这是判定录播最省事的
+   一条特征。库里存多张**同版式**的背景，空场时每写完 N 个名字换一张。
+   只能在两张字之间换——写到一半换底板会闪，观众一眼看出是程序在切图。 */
+async function loadBgLib() {
+  let d;
+  try {
+    d = await (await fetch('/api/background/list')).json();
+  } catch (e) { return; }
+  if (!d || !d.ok) return;
+  const rot = d.rotate || {};
+  const on = document.getElementById('bgRotOn');
+  const ev = document.getElementById('bgEvery');
+  if (on) on.checked = !!rot.rotate;
+  if (ev) ev.value = rot.every || 6;
+  const now = document.getElementById('bgRotNow');
+  if (now) {
+    now.textContent = `· 库里 ${d.count} 张`
+      + (d.count < 2 ? '（不足 2 张，轮换不会动）' : '');
+  }
+  const box = document.getElementById('bgLib');
+  if (!box) return;
+  if (!d.items.length) {
+    box.innerHTML = '<div class="libempty">还没有背景。点「存进背景库」传几张同版式的，轮换才有意义。</div>';
+    return;
+  }
+  box.innerHTML = d.items.map(it => `
+    <div class="libcell"${it.current
+      ? ' style="border-color:#f2bf62;box-shadow:0 0 0 2px rgba(242,191,98,.3)"' : ''}>
+      <img src="${esc(it.url)}" alt="${esc(it.name)}"
+           onclick="pickBg('${esc(it.id)}')" style="cursor:pointer">
+      <div class="nm" title="${esc(it.name)}">${esc(it.name)}${it.current ? ' · 当前' : ''}</div>
+      <button class="del" title="从库里删掉" onclick="delBg('${esc(it.id)}')">×</button>
+    </div>`).join('');
+}
+
+async function pickBg(id) {
+  const r = await fetch('/api/background/pick', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '切换失败'); return; }
+  loadBg();
+  loadBgLib();
+}
+
+async function delBg(id) {
+  if (!confirm('从库里删掉这张？当前在用的那张删了会自动换到第一张。')) return;
+  const r = await fetch('/api/background/remove', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '删除失败'); return; }
+  loadBgLib();
+}
+
+async function uploadBgLib(inp) {
+  const f = inp.files && inp.files[0];
+  if (!f) return;
+  const erase = document.getElementById('bgErase').checked;
+  const box = document.getElementById('bgBox').value.trim();
+  const q = new URLSearchParams({
+    name: (f.name || '').replace(/\.[^.]+$/, '').slice(0, 20) || '背景',
+  });
+  if (erase) q.set('erase', '1');
+  if (erase && box) q.set('box', box);
+  const btn = inp.previousElementSibling;
+  const old = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '处理中…'; }
+  try {
+    const r = await fetch('/api/background/add?' + q.toString(), {
+      method: 'POST',
+      headers: { 'content-type': 'application/octet-stream' },
+      body: f,
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!d.ok) { alert(d.error || '上传失败'); return; }
+    loadBg();
+  } catch (e) {
+    alert('上传失败：' + e);
+  } finally {
+    inp.value = '';
+    if (btn) { btn.disabled = false; btn.textContent = old || '存进背景库'; }
+  }
+}
+
+async function saveBgRot() {
+  const body = {
+    rotate: document.getElementById('bgRotOn').checked,
+    every: parseInt(document.getElementById('bgEvery').value, 10) || 6,
+  };
+  const r = await fetch('/api/background/rotate', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) alert(d.error || '保存失败');
+  loadBgLib();
+}
+
+/* ------------------------------------------------------------ 真人小窗
+   平台判"录播 / 挂机"看的是画面里有没有会动的人。这里传的是本人录像，
+   在画面左下角当画中画循环播。视频一律静音——浏览器只给 muted 自动播放许可。 */
+async function loadCam() {
+  let d;
+  try {
+    d = await (await fetch('/api/cam')).json();
+  } catch (e) { return; }
+  if (!d || !d.ok) return;
+
+  const o = d.opt || {};
+  const on = document.getElementById('camOn');
+  if (on) on.checked = !!o.on;
+  const mir = document.getElementById('camMirror');
+  if (mir) mir.checked = !!o.mirror;
+  const pos = document.getElementById('camPos');
+  if (pos) pos.value = o.pos === 'bl' ? 'bl' : 'br';
+  const map = { camW: o.w, camH: o.h, camK: o.k, camX: o.x, camY: o.y };
+  for (const id in map) {
+    const el = document.getElementById(id);
+    // 正在输入的那个框别被覆盖，用户改到一半会被自己改回去
+    if (el && document.activeElement !== el) el.value = map[id];
+  }
+  const now = document.getElementById('camNow');
+  if (now) {
+    now.textContent = d.count
+      ? `${d.count} 段 · ${d.on ? '显示中' : '已隐藏'}`
+      : '还没传视频';
+  }
+
+  const box = document.getElementById('camLib');
+  if (!box) return;
+  if (!d.items.length) {
+    box.innerHTML = '<div class="libempty">还没传真人视频，画面左下角会一直是空的。</div>';
+    return;
+  }
+  box.innerHTML = d.items.map(it => `
+    <div class="libcell"${it.cur
+      ? ' style="border-color:#f2bf62;box-shadow:0 0 0 2px rgba(242,191,98,.3)"' : ''}>
+      <video src="${esc(it.url)}#t=0.1" muted preload="metadata"
+             onclick="pickCam('${esc(it.id)}')"
+             style="display:block;width:100%;aspect-ratio:3/4;object-fit:cover;cursor:pointer"></video>
+      <div class="nm" title="${esc(it.name)}">${esc(it.name)}${it.cur ? ' · 当前' : ''}</div>
+      <button class="del" title="删掉这段" onclick="delCam('${esc(it.id)}')">×</button>
+      ${it.codec && it.codec !== 'h264' && it.codec !== 'vp9'
+        ? `<div class="nm" style="color:#e8a08f;padding-top:0">⚠ ${esc(it.codec)}</div>` : ''}
+    </div>`).join('');
+}
+
+async function uploadCam(inp) {
+  const f = inp.files && inp.files[0];
+  if (!f) return;
+  if (f.size > 200 * 1024 * 1024) {
+    alert('视频超过 200MB，剪短一点（建议 5~20 秒、720p 以内）');
+    inp.value = '';
+    return;
+  }
+  const q = new URLSearchParams({
+    name: (f.name || '').replace(/\.[^.]+$/, '').slice(0, 20) || '真人',
+    filename: f.name || '',
+    pick: '1',
+  });
+  const btn = inp.previousElementSibling;
+  const old = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = `上传中… ${(f.size / 1048576).toFixed(0)}MB`; }
+  try {
+    const r = await fetch('/api/cam/add?' + q.toString(), {
+      method: 'POST',
+      headers: { 'content-type': 'application/octet-stream' },
+      body: f,
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!d.ok) { alert(d.error || '上传失败'); return; }
+    // 转码了 / 转不了 / 认不出编码，后端会带一条说明回来
+    if (d.note) alert(d.note);
+    loadCam();
+  } catch (e) {
+    alert('上传失败：' + e);
+  } finally {
+    inp.value = '';
+    if (btn) { btn.disabled = false; btn.textContent = old || '上传真人视频'; }
+  }
+}
+
+async function pickCam(id) {
+  const r = await fetch('/api/cam/pick', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '切换失败'); return; }
+  loadCam();
+}
+
+async function delCam(id) {
+  if (!confirm('删掉这段视频？当前在用的删了会自动换到第一段。')) return;
+  const r = await fetch('/api/cam/remove', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '删除失败'); return; }
+  loadCam();
+}
+
+async function fixCam() {
+  if (!confirm('把库里不是 H.264 的段转成 H.264？\n（HEVC 在直播伴侣里播不出来，是一个黑方块）')) return;
+  const r = await fetch('/api/cam/fix', { method: 'POST' });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '转码失败'); return; }
+  alert((d.fixed && d.fixed.length)
+        ? '转好了：' + d.fixed.join('、')
+        : '没有需要转的（或者这台机器没有可用的 ffmpeg）');
+  loadCam();
+}
+
+async function saveCamOpt() {
+  const num = id => parseInt(document.getElementById(id).value, 10);
+  const body = {
+    on: document.getElementById('camOn').checked,
+    mirror: document.getElementById('camMirror').checked,
+    pos: document.getElementById('camPos').value,
+    w: num('camW') || 0,
+    h: num('camH') || 0,
+    k: num('camK') || 0,
+    x: isNaN(num('camX')) ? 40 : num('camX'),
+    y: isNaN(num('camY')) ? 58 : num('camY'),
+  };
+  const r = await fetch('/api/cam/opt', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) alert(d.error || '保存失败');
+  loadCam();
+}
+
+/* 签名样式：字体 + 材质。改完立刻作用到下一单（后端每批都重读配置），
+   同时按行写回 config.yaml（保留中文注释），重开以后还是这套。 */
+/* 祝福语音：开关 / 音色 / 语速 / 文案来源。改完下一单就生效（后端每单都读最新配置），
+   同时按行写回 config.yaml，重开还在。 */
+let vcLoaded = false;
+async function loadVoice() {
+  const on = document.getElementById('vcOn');
+  const sv = document.getElementById('selVoice');
+  const sr = document.getElementById('selRate');
+  const ss = document.getElementById('selSource');
+  if (!on || !sv) return;
+  let d;
+  try {
+    d = await (await fetch('/api/voice')).json();
+  } catch (e) { return; }
+  if (!d || !d.ok) return;
+  if (!vcLoaded) {
+    sv.innerHTML = d.voices.map(o =>
+      `<option value="${esc(o.id)}">${esc(o.label)}</option>`).join('');
+    vcLoaded = true;
+  }
+  on.checked = !!d.enabled;
+  sv.value = d.voice || 'zh-CN-XiaoxiaoNeural';
+  sr.value = d.rate || '+0%';
+  ss.value = d.source || 'ai';
+  const st = d.status || {};
+  document.getElementById('voiceNow').textContent =
+    `· ${d.enabled ? '已开' : '已关'} · 音色 ${sv.value.replace('zh-CN-', '').replace('Neural', '')}`
+    + ` · 已合成 ${st.files || 0} 句 / ${st.texts || 0} 条文案`;
+}
+
+async function saveVoice() {
+  const body = {
+    enabled: document.getElementById('vcOn').checked,
+    voice: document.getElementById('selVoice').value,
+    rate: document.getElementById('selRate').value,
+    source: document.getElementById('selSource').value,
+  };
+  const r = await fetch('/api/voice', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '保存失败'); }
+  loadVoice();
+}
+
+async function previewVoice() {
+  const name = document.getElementById('vcName').value.trim() || '张三';
+  const r = await fetch('/api/voice/preview?name=' + encodeURIComponent(name));
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '试听失败'); return; }
+  try {
+    const a = new Audio(d.url);
+    a.volume = 0.95;
+    a.play().catch(() => {});
+  } catch (e) { /* ignore */ }
+  alert(`「${name}」：${d.text}\n（${d.ms}ms）`);
+}
+
+async function loadStyle() {
+  const sf = document.getElementById('selFont');
+  const ss = document.getElementById('selStyle');
+  if (!sf || !ss) return;
+  let d;
+  try {
+    d = await (await fetch('/api/style')).json();
+  } catch (e) { return; }
+  if (!d || !d.ok) return;
+  sf.innerHTML = d.fonts.map(o =>
+    `<option value="${esc(o.id)}">${esc(o.label)}</option>`).join('');
+  ss.innerHTML = d.styles.map(o =>
+    `<option value="${esc(o.id)}">${esc(o.label)}</option>`).join('');
+  sf.value = d.font || '';
+  ss.value = d.style || 'ink';
+  const fl = (d.fonts.find(o => o.id === d.font) || {}).label || '楷体';
+  const sl = (d.styles.find(o => o.id === d.style) || {}).label || d.style;
+  document.getElementById('styleNow').textContent = `当前：${fl} + ${sl}`;
+}
+
+async function saveStyle() {
+  const font = document.getElementById('selFont').value;
+  const style = document.getElementById('selStyle').value;
+  const r = await fetch('/api/style', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ font, style }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '切换失败'); loadStyle(); return; }
+  loadStyle();
+}
+
+async function saveLive() {  const box = document.getElementById('liveRoom');
+  const raw = box.value.trim();
+  if (!raw) { alert('请先粘贴直播间地址'); return; }
+  const r = await fetch('/api/live', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ room: raw }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '保存失败'); return; }
+  box.dataset.room = d.room;
+  box.value = 'https://live.douyin.com/' + d.room;
+  alert(d.switched
+    ? `已切到直播间 ${d.room}`
+    : `已保存 ${d.room}\n${d.note || '采集器不在线，启动后生效'}`);
+  loadLive();
+}
+
+async function loadLib() {
+  const r = await fetch('/api/library').catch(() => null);
+  // 接口不通时别再静默返回：以前 404 会被 catch 成 null，面板一片空白，
+  // 看上去就像"后台没有图片管理"——实际是跑着旧进程（还没这几个接口）。
+  if (!r || !r.ok) {
+    document.getElementById('libCount').textContent = '';
+    document.getElementById('libGrid').innerHTML =
+      `<div class="libempty">${r ? '接口返回 ' + r.status : '接口没响应'}
+       —— 后台可能还是旧进程，重启一次 <code>python run.py</code> 再刷新本页。</div>`;
+    return;
+  }
+  const d = await r.json().catch(() => null);
+  if (!d || !d.ok) return;
+  document.getElementById('libCount').textContent = `· ${d.count} 张`;
+  const sig = (d.items || []).map(i => i.stem).join(',');
+  if (sig === libSig) return;
+  libSig = sig;
+  document.getElementById('libGrid').innerHTML = (d.items || []).length
+    ? d.items.map(i => `
+      <div class="libcell">
+        <img src="${i.url}" loading="lazy" alt="${esc(i.name)}">
+        <button class="del" title="从轮播里删掉" onclick="delLib('${i.stem}')">×</button>
+        <div class="nm" title="${esc(i.stem)}">${esc(i.name)}</div>
+      </div>`).join('')
+    : '<div class="libempty">还没有素材。传几张进来，空场就有画面了。</div>';
+}
+
+async function delLib(stem) {
+  if (!confirm('从空场轮播里删掉这张？')) return;
+  const r = await fetch('/api/library/delete', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ stem }),
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!d.ok) { alert(d.error || '删除失败'); return; }
+  libSig = '';
+  loadLib();
+}
+
+async function uploadLib(input) {
+  const name = document.getElementById('libName').value.trim();
+  const files = [...input.files];
+  input.value = '';
+  for (const f of files) {
+    document.getElementById('libCount').textContent = `· 上传中 ${f.name}…`;
+    const qs = new URLSearchParams({ filename: f.name, name });
+    const r = await fetch('/api/library/upload?' + qs.toString(),
+                          { method: 'POST', body: f });
+    const d = await r.json().catch(() => ({}));
+    if (!d.ok) alert(`${f.name}：${d.error || '上传失败'}`);
+  }
+  libSig = '';
+  loadLib();
+}
+
+async function tick() {
+  try {
+    const d = await (await fetch('/api/admin/state')).json();
+    render(d);
+    renderCfg(d);
+  } catch (e) {}
+}
+
+tick();
+loadLib();
+loadLive();
+loadStyle();
+loadVoice();
+loadBg();
+loadCam();   // 不轮询：每次重绘都会让网格里的 <video> 重新拉流，闪烁很明显
+setInterval(tick, 1500);
+setInterval(loadLib, 6000);
+setInterval(loadLive, 6000);
+setInterval(loadVoice, 15000);
+</script>
+</body>
+</html>
