@@ -16,8 +16,8 @@
 | [批量提示词工作台](prompt-batch-studio/) | <img src="prompt-batch-studio/screenshots/pc-1.jpg" width="220"> | Windows 桌面工具：把「写需求 → 粘贴 → 等 AI 写完」整条队列自动化。 | Electron · UIAutomation |
 | [苔溪镇 · Mossbrook Village](xiaozhen/) | <img src="xiaozhen/screenshots/pc-1.jpg" width="220"> | 模块化中世纪小镇与程序化骨骼动画的第三人称漫步。 | three.js · GLTF |
 | [自动视频图文工坊](zidongtuwen/) | <img src="zidongtuwen/screenshots/pc-1.jpg" width="220"> | 文案 → 配图 → 配音 → 字幕 → 成片，本地运行的短视频流水线。 | Python · Flask · Selenium · ffmpeg |
-| [直播间手写签名](zhibo-sign/) | （暂无截图） | 观众弹幕写名字，当场写成沙画签名：拆笔顺、沙粒笔触、配祝福语音，礼物可插队。 | Python · FastAPI · OpenCV · OBS 叠加层 |
-| [直播间头像简笔画](zhibo-xiaoxiang/) | （暂无截图） | 观众扣 1 排队，取头像生成简笔画，拆成一笔一笔在直播画面上实时描出。 | Python · FastAPI · OpenCV · OBS 叠加层 |
+| [直播间手写签名](zhibo-sign/) | <img src="zhibo-sign/screenshots/pc-1.jpg" width="220"> | 观众弹幕写名字，当场写成沙画签名：拆笔顺、沙粒笔触、配祝福语音，礼物可插队。 | Python · FastAPI · OpenCV · OBS 叠加层 |
+| [直播间头像简笔画](zhibo-xiaoxiang/) | <img src="zhibo-xiaoxiang/screenshots/pc-1.jpg" width="220"> | 观众扣 1 排队，取头像生成简笔画，拆成一笔一笔在直播画面上实时描出。 | Python · FastAPI · OpenCV · OBS 叠加层 |
 
 ## 快速开始
 
